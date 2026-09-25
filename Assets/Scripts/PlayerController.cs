@@ -7,6 +7,8 @@ public class PlayerController : MonoBehaviour
     private bool _jumpQueued;
 
     private bool _isGrounded = true;
+
+    [SerializeField] private MovementSettings movement;
     
     [Header("Movement Inputs")]
     [SerializeField] private InputActionReference moveAction;

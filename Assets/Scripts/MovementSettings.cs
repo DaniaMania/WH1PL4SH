@@ -8,8 +8,6 @@ public class MovementSettings : ScriptableObject
     [SerializeField] private float groundWishSpeed = 8;
     public float GroundWishSpeed => groundWishSpeed; 
     
-    /* how to use: int currentGroundWishSpeed = myScriptableObject.GroundWishSpeed; */
-    
     [Min(0), Tooltip("How quickly you reach ground wish speed. Higher = faster build up.")]
     [SerializeField] private float groundAcceleration = 10;
     public float GroundAcceleration => groundAcceleration;
