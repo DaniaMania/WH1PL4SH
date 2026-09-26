@@ -5,10 +5,10 @@ using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviour
 {
     private Vector2 _moveInput;
-    private bool _jumpQueued;
     private bool _isGrounded;
     private Vector3 _groundNormal;
     private float _lastJumpTime;
+    private float _bufferTimer;
     
     [Header("Player References")]
     [SerializeField] private CinemachineCamera playerCamera;
@@ -31,7 +31,7 @@ public class PlayerController : MonoBehaviour
         
         if (jumpAction.action.WasPressedThisFrame())
         {
-            _jumpQueued = true;
+            _bufferTimer = movement.JumpBufferTime;
         }
     }
 
@@ -119,19 +119,14 @@ public class PlayerController : MonoBehaviour
 
     private bool TryJump()
     {
-        // player jump is queued in Update
-        if (_jumpQueued)
-        {
-            _jumpQueued = false;
-            
-            // check if player is grounded
-            if (_isGrounded)
+       // check if player is grounded
+            if (_bufferTimer > 0 && _isGrounded)
             {
+                _bufferTimer = 0;
                 return true;
             }
+            _bufferTimer -= Time.fixedDeltaTime;
             return false;
-        }
-        return false;
     }
 
     private void CheckGround()

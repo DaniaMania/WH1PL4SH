@@ -19,6 +19,7 @@ MonoBehaviour:
   airWishSpeedCap: 3
   airAcceleration: 10
   jumpHeight: 1.15
+  jumpBufferTime: 1
   gravity: 20
   groundCheckRadiusScale: 0.95
   groundCheckDistance: 0.14

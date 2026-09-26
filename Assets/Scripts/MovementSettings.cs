@@ -34,6 +34,10 @@ public class MovementSettings : ScriptableObject
     [SerializeField] private float jumpHeight = 1.15f;
     public float JumpHeight => jumpHeight;
     
+    [Min(0), Tooltip("How much buffer time the player has for jumping.")]
+    [SerializeField] private float jumpBufferTime = 0.1f;
+    public float JumpBufferTime => jumpBufferTime;
+    
     [Min(0), Tooltip("Downward acceleration to keep the player going downwards. Higher = stronger downwards force.")]
     [SerializeField] private float gravity = 20;
     public float Gravity => gravity;
