@@ -25,8 +25,8 @@ public class MovementSettings : ScriptableObject
     [SerializeField] private float airWishSpeedCap = 0.75f;
     public float AirWishSpeedCap => airWishSpeedCap;
     
-    [Min(0), Tooltip("How strongly you can steer in the air.")]
-    [SerializeField] private float airAcceleration = 10;
+    [Range(0, 10), Tooltip("How strongly you steer in the air. Higher = easier speed gain and tighter air turns.")]
+    [SerializeField] private float airAcceleration = 4;
     public float AirAcceleration => airAcceleration;
     
     [Header("Jump and Gravity")]
@@ -38,6 +38,28 @@ public class MovementSettings : ScriptableObject
     [SerializeField] private float gravity = 20;
     public float Gravity => gravity;
     
+    [Header("Ground Check")]
+    [Range(0.5f, 1), Tooltip("Ground check sphere size.")]
+    [SerializeField] private float groundCheckRadiusScale = 0.9f;
+    public float GroundCheckRadiusScale => groundCheckRadiusScale;
     
-    // no ground check yet
+    [Min(0), Tooltip("How far below the feet still counts as grounded (m).")]
+    [SerializeField] private float groundCheckDistance = 0.1f;
+    public float GroundCheckDistance => groundCheckDistance;
+    
+    [Min(0), Tooltip("How far above the capsule's bottom the cast starts (m).")]
+    [SerializeField] private float groundCheckStartOffset = 0.05f;
+    public float GroundCheckStartOffset => groundCheckStartOffset;
+    
+    [Range(0, 90), Tooltip("Steepest walkable surface (degrees).")]
+    [SerializeField] private float maxSlopeAngle = 45;
+    public float MaxSlopeAngle => maxSlopeAngle;
+    
+    [Min(0), Tooltip("Seconds after a jump during which ground is ignored.")]
+    [SerializeField] private float groundIgnoreAfterJump = 0.1f;
+    public float GroundIgnoreAfterJump => groundIgnoreAfterJump;
+    
+    [Tooltip("Layers that count as ground.")]
+    [SerializeField] private LayerMask groundLayers;
+    public LayerMask GroundLayers => groundLayers;
 }
