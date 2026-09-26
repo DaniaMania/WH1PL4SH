@@ -181,4 +181,7 @@ public class PlayerController : MonoBehaviour
         
         return (origin, radius, distance);
     } 
+    
+    // Reveal _isGrounded so it can be used in DevTools
+    public bool IsGrounded => _isGrounded;
 }

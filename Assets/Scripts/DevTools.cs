@@ -11,6 +11,7 @@ public class DevTools : MonoBehaviour
 
     [Header("References")]
     [SerializeField] private Rigidbody playerRb;
+    [SerializeField] private PlayerController playerController;
     [SerializeField] private Transform playerSpawn;
 
     [Header("FPS")]
@@ -31,6 +32,10 @@ public class DevTools : MonoBehaviour
     private void Start()
     {
         if (playerRb == null) return;
+
+        // Falls back to the controller on the same object as the Rigidbody if not assigned
+        if (playerController == null) playerController = playerRb.GetComponent<PlayerController>();
+
         _startPosition = playerRb.position;
         _startRotation = playerRb.rotation;
     }
@@ -66,7 +71,7 @@ public class DevTools : MonoBehaviour
     {
         if (!_windowVisible) return;
 
-        _labelStyle ??= new GUIStyle(GUI.skin.label) { fontSize = 14 };
+        _labelStyle ??= new GUIStyle(GUI.skin.label) { fontSize = 14, richText = true };
         GUILayout.Window(987654, _windowRect, DrawWindow, "Dev Tools");
     }
 
@@ -83,6 +88,14 @@ public class DevTools : MonoBehaviour
         else
         {
             GUILayout.Label("Assign Player Rb for speed", _labelStyle);
+        }
+
+        if (playerController != null)
+        {
+            string grounded = playerController.IsGrounded
+                ? "<color=#4CFF4C>True</color>"
+                : "<color=#FF4C4C>False</color>";
+            GUILayout.Label($"Grounded  {grounded}", _labelStyle);
         }
 
         GUILayout.Space(8);

@@ -20,14 +20,18 @@ public class MovementSettings : ScriptableObject
     [SerializeField] private float stopSpeed = 2.5f;
     public float StopSpeed => stopSpeed;
     
+    
+    
     [Header("Air Movement")] 
-    [Range(0,10), Tooltip("Caps wish speed while airborne. Doesn't limit air speed.")]
+    [Range(0,10), Tooltip("Caps wish speed while airborne. Doesn't limit air speed. Raise for more speed gain when air-strafing.")]
     [SerializeField] private float airWishSpeedCap = 0.75f;
     public float AirWishSpeedCap => airWishSpeedCap;
     
-    [Range(0, 10), Tooltip("How strongly you steer in the air. Higher = easier speed gain and tighter air turns.")]
+    [Range(0, 10), Tooltip("Limits air braking and reversing.")]
     [SerializeField] private float airAcceleration = 4;
     public float AirAcceleration => airAcceleration;
+    
+    
     
     [Header("Jump and Gravity")]
     [Min(0), Tooltip("How high you can jump. Jump is calculated from this and gravity.")]
@@ -41,6 +45,8 @@ public class MovementSettings : ScriptableObject
     [Min(0), Tooltip("Downward acceleration to keep the player going downwards. Higher = stronger downwards force.")]
     [SerializeField] private float gravity = 20;
     public float Gravity => gravity;
+    
+    
     
     [Header("Ground Check")]
     [Range(0.5f, 1), Tooltip("Ground check sphere size.")]

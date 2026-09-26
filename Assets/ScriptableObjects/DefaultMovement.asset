@@ -15,11 +15,11 @@ MonoBehaviour:
   groundWishSpeed: 10
   groundAcceleration: 10
   friction: 2
-  stopSpeed: 1.5
+  stopSpeed: 2.5
   airWishSpeedCap: 3
   airAcceleration: 10
   jumpHeight: 1.15
-  jumpBufferTime: 1
+  jumpBufferTime: 0.1
   gravity: 20
   groundCheckRadiusScale: 0.95
   groundCheckDistance: 0.14
