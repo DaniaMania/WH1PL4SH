@@ -20,3 +20,11 @@ MonoBehaviour:
   airAcceleration: 10
   jumpHeight: 1.15
   gravity: 20
+  groundCheckRadiusScale: 0.95
+  groundCheckDistance: 0.14
+  groundCheckStartOffset: 0
+  maxSlopeAngle: 45
+  groundIgnoreAfterJump: 0.1
+  groundLayers:
+    serializedVersion: 2
+    m_Bits: 55
