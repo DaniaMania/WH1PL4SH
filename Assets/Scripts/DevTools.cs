@@ -6,12 +6,11 @@ public class DevTools : MonoBehaviour
 {
     [Header("Keys")]
     [SerializeField] private Key toggleWindowKey = Key.Backquote;
-    [SerializeField] private Key respawnKey = Key.F5;
-    [SerializeField] private Key reloadSceneKey = Key.F6;
+    [SerializeField] private Key respawnKey = Key.F;
+    [SerializeField] private Key reloadSceneKey = Key.G;
 
     [Header("References")]
     [SerializeField] private Rigidbody playerRb;
-    [Tooltip("Optional. If empty, the player respawns where they started the scene.")]
     [SerializeField] private Transform playerSpawn;
 
     [Header("FPS")]
