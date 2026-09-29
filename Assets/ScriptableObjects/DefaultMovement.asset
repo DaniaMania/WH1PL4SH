@@ -16,8 +16,10 @@ MonoBehaviour:
   groundAcceleration: 10
   friction: 2
   stopSpeed: 2.5
-  airWishSpeedCap: 4
+  landingGraceTime: 2.5
+  airWishSpeedCap: 5
   airAcceleration: 10
+  airSpeedGainScale: 0.5
   jumpHeight: 1.15
   jumpBufferTime: 0.2
   gravity: 20
@@ -29,3 +31,7 @@ MonoBehaviour:
   groundLayers:
     serializedVersion: 2
     m_Bits: 55
+  maxDashCharges: 3
+  dashRechargeTime: 3
+  dashSpeed: 1.5
+  dashRedirect: 0

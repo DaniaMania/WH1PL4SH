@@ -50,11 +50,21 @@ public class PlayerController : MonoBehaviour
         if (_isGrounded && !jumped)
         {
             horizontalVelocity = ApplyFriction(horizontalVelocity);
-            horizontalVelocity = Accelerate(horizontalVelocity, wishDirection, movement.GroundWishSpeed, movement.GroundWishSpeed,movement.GroundAcceleration);
+            horizontalVelocity = Accelerate(horizontalVelocity, wishDirection, movement.GroundWishSpeed, movement.GroundWishSpeed, movement.GroundAcceleration);
         }
         else
         {
-            horizontalVelocity = Accelerate(horizontalVelocity, wishDirection, Mathf.Min(movement.AirWishSpeedCap, movement.GroundWishSpeed), movement.GroundWishSpeed, movement.AirAcceleration);
+            float oldSpeed = horizontalVelocity.magnitude;
+            Vector3 newVelocity = Accelerate(horizontalVelocity, wishDirection, Mathf.Min(movement.AirWishSpeedCap, movement.GroundWishSpeed), movement.GroundWishSpeed, movement.AirAcceleration);
+            float newSpeed = newVelocity.magnitude;
+
+            if (newSpeed > oldSpeed)
+            {
+                float keptSpeed = oldSpeed + movement.AirSpeedGainScale * (newSpeed - oldSpeed);
+                newVelocity = newVelocity * (keptSpeed / newSpeed);
+            }
+            
+            horizontalVelocity = newVelocity;
         }
 
         if (jumped)
