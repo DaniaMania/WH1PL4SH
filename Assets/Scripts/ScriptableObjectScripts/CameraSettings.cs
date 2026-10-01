@@ -23,7 +23,7 @@ public class CameraSettings : ScriptableObject
     [SerializeField] private float fovSmoothRate = 10;
     public float FovSmoothRate => fovSmoothRate;
     
-    [Tooltip("How fast FOV follows its target.")]
+    [Tooltip("If you are adding falling to the speed for FOV.")]
     [SerializeField] private bool useTotalSpeed = true;
     public bool UseTotalSpeed => useTotalSpeed;
     
@@ -33,11 +33,7 @@ public class CameraSettings : ScriptableObject
     
     [Min(0), Tooltip("How fast the punch fades.")]
     [SerializeField] private float dashPunchDecayRate = 10;
-    public float DashPunchDecay => dashPunchDecayRate;
-    
-    [Min(0), Tooltip("Camera kick size.")]
-    [SerializeField] private float dashImpulseStrength = 10;
-    public float DashImpulseStrength => dashImpulseStrength;
+    public float DashPunchDecayRate => dashPunchDecayRate;
     
     [Range(0, 1), Tooltip("0–1 accessibility multiplier.")]
     [SerializeField] private float effectsScale = 0;
