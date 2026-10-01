@@ -1,3 +1,4 @@
+using System;
 using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -13,6 +14,8 @@ public class PlayerController : MonoBehaviour
     private bool _dashQueued;
     private float _dashCharge;
     private float _dashEndTime;
+    
+    public event Action<Vector3> Dashed;
     
     [Header("Player References")]
     [SerializeField] private CinemachineCamera playerCamera;
@@ -73,9 +76,9 @@ public class PlayerController : MonoBehaviour
 
         bool dashing = Time.time < _dashEndTime;
 
-        bool skipHorizontal = !dashed || (!dashing && movement.DashLocksMovement);
+        bool skipHorizontal = dashed || (dashing && movement.DashLocksMovement);
 
-        if (skipHorizontal)
+        if (!skipHorizontal)
         {
             if (_isGrounded && !jumped)
             {
@@ -117,8 +120,12 @@ public class PlayerController : MonoBehaviour
             
             if (movement.DashCancelsFall && full.y < 0)
                 full.y = 0;
+
+            Vector3 dashDirection = GetDashDirection(_moveInput);
             
-            full = ApplyDash(full, GetDashDirection(_moveInput));
+            Dashed?.Invoke(dashDirection);
+            
+            full = ApplyDash(full, dashDirection);
             
             horizontalVelocity = new Vector3(full.x, 0, full.z);
             velocity.y = full.y;
@@ -309,4 +316,6 @@ public class PlayerController : MonoBehaviour
     // Reveal values so it can be used in DevTools
     public bool IsGrounded => _isGrounded;
     public float DashCharge => _dashCharge;
+    public float HorizontalSpeed => new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z).magnitude;
+    public float TotalSpeed => rb.linearVelocity.magnitude;
 }

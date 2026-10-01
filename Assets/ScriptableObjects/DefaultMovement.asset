@@ -20,7 +20,7 @@ MonoBehaviour:
   airWishSpeedCap: 5
   airAcceleration: 10
   airSpeedGainScale: 0.5
-  jumpHeight: 1.15
+  jumpHeight: 1.2
   jumpBufferTime: 0.2
   gravity: 20
   groundCheckRadiusScale: 0.95
@@ -32,8 +32,8 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 55
   maxDashCharges: 3
-  dashRechargeTime: 1
-  dashSpeed: 10
+  dashRechargeTime: 2
+  dashSpeed: 5
   dashRedirect: 1
   dashDirectionMode: 2
   flattenBackDash: 0
