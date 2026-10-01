@@ -7,8 +7,11 @@ public class PlayerController : MonoBehaviour
     private Vector2 _moveInput;
     private bool _isGrounded;
     private Vector3 _groundNormal;
-    private float _lastJumpTime;
+    private float _lastLeaveGroundTime;
     private float _bufferTimer;
+
+    private bool _dashQueued;
+    private float _dashCharge;
     
     [Header("Player References")]
     [SerializeField] private CinemachineCamera playerCamera;
@@ -19,11 +22,14 @@ public class PlayerController : MonoBehaviour
     [Header("Movement Inputs")]
     [SerializeField] private InputActionReference moveAction;
     [SerializeField] private InputActionReference jumpAction;
+    [SerializeField] private InputActionReference dashAction;
 
     void Start()
     {
         // lock cursor to the middle of the screen (lock mode = locked caused cursor to not be visible as well)
         Cursor.lockState = CursorLockMode.Locked;
+
+        _dashCharge = movement.MaxDashCharges;
     }
     void Update()
     {
@@ -33,10 +39,18 @@ public class PlayerController : MonoBehaviour
         {
             _bufferTimer = movement.JumpBufferTime;
         }
+
+        if (dashAction.action.WasPressedThisFrame())
+        {
+            _dashQueued = true;
+        }
     }
 
     void FixedUpdate()
     {
+        // Dash recharging over time
+        _dashCharge = Mathf.Min(_dashCharge + Time.fixedDeltaTime/movement.DashRechargeTime, movement.MaxDashCharges);
+        
         Vector3 wishDirection = GetWishDirection(_moveInput);
         
         Vector3 velocity = rb.linearVelocity;
@@ -44,32 +58,38 @@ public class PlayerController : MonoBehaviour
         
         CheckGround();
 
-        // Jumping and gravity application
+        // Jumping application
         bool jumped = TryJump();
         
-        if (_isGrounded && !jumped)
-        {
-            horizontalVelocity = ApplyFriction(horizontalVelocity);
-            horizontalVelocity = Accelerate(horizontalVelocity, wishDirection, movement.GroundWishSpeed, movement.GroundWishSpeed, movement.GroundAcceleration);
-        }
-        else
-        {
-            float oldSpeed = horizontalVelocity.magnitude;
-            Vector3 newVelocity = Accelerate(horizontalVelocity, wishDirection, Mathf.Min(movement.AirWishSpeedCap, movement.GroundWishSpeed), movement.GroundWishSpeed, movement.AirAcceleration);
-            float newSpeed = newVelocity.magnitude;
+        // Dashing application
+        bool dashed = TryConsumeDash();
 
-            if (newSpeed > oldSpeed)
+        if (!dashed)
+        {
+            if (_isGrounded && !jumped)
             {
-                float keptSpeed = oldSpeed + movement.AirSpeedGainScale * (newSpeed - oldSpeed);
-                newVelocity = newVelocity * (keptSpeed / newSpeed);
+                horizontalVelocity = ApplyFriction(horizontalVelocity);
+                horizontalVelocity = Accelerate(horizontalVelocity, wishDirection, movement.GroundWishSpeed, movement.GroundWishSpeed, movement.GroundAcceleration);
             }
+            else
+            {
+                float oldSpeed = horizontalVelocity.magnitude;
+                Vector3 newVelocity = Accelerate(horizontalVelocity, wishDirection, Mathf.Min(movement.AirWishSpeedCap, movement.GroundWishSpeed), movement.GroundWishSpeed, movement.AirAcceleration);
+                float newSpeed = newVelocity.magnitude;
+
+                if (newSpeed > oldSpeed)
+                {
+                    float keptSpeed = oldSpeed + movement.AirSpeedGainScale * (newSpeed - oldSpeed);
+                    newVelocity = newVelocity * (keptSpeed / newSpeed);
+                }
             
-            horizontalVelocity = newVelocity;
+                horizontalVelocity = newVelocity;
+            }
         }
 
         if (jumped)
         {
-            _lastJumpTime = Time.time;
+            _lastLeaveGroundTime = Time.time;
             float jumpVelocity = Mathf.Sqrt(2 * movement.Gravity * movement.JumpHeight);
             velocity.y = jumpVelocity;
         }
@@ -78,7 +98,33 @@ public class PlayerController : MonoBehaviour
         else
             velocity.y -= movement.Gravity * Time.fixedDeltaTime;
         
+        if (dashed)
+        {
+            Vector3 full = new Vector3(horizontalVelocity.x, velocity.y, horizontalVelocity.z);
+            full = ApplyDash(full, GetDashDirection(_moveInput));
+            
+            horizontalVelocity = new Vector3(full.x, 0, full.z);
+            velocity.y = full.y;
+            
+            if (velocity.y > 0)
+            {
+                _lastLeaveGroundTime = Time.time;
+            }
+        }
+        
         rb.linearVelocity = new Vector3(horizontalVelocity.x, velocity.y, horizontalVelocity.z);
+    }
+    
+    private Vector3 ApplyDash(Vector3 full, Vector3 direction)
+    {
+        if (movement.DashRedirect)
+        {
+            float fullHorizontalSpeed = new Vector3(full.x, 0, full.z).magnitude;
+
+            return (direction * (fullHorizontalSpeed + movement.DashSpeed));
+        }
+
+        return (full + direction * movement.DashSpeed);
     }
 
     /* Changes 2D input into 3D world direction relative to camera*/
@@ -95,6 +141,45 @@ public class PlayerController : MonoBehaviour
         
         // Unit length so diagonals are not faster (only input)
         return ((forward * moveInput.y) + (right * moveInput.x)).normalized;
+    }
+
+    private Vector3 GetDashDirection(Vector2 moveInput)
+    {
+        // Make 2 different forward, one flat and one not
+        Vector3 forward = playerCamera.transform.forward;
+        
+        Vector3 forwardFlat = forward;
+        forwardFlat.y = 0;
+        forwardFlat.Normalize();
+        
+        Vector3 right = playerCamera.transform.right;
+        Vector3 dashForward = forward;
+
+        // Switch case for different movement modes
+        switch (movement.DashDirectionMode)
+        {
+            
+            case DashDirectionMode.FlatKeys:
+                if (moveInput == Vector2.zero)
+                    return forwardFlat;
+                else
+                    return GetWishDirection(moveInput);
+                
+            case DashDirectionMode.CameraLook:
+                return forward;
+                
+            case DashDirectionMode.CameraRelativeKeys:
+                
+                if (moveInput == Vector2.zero)
+                    return forward;
+                else if (moveInput.y < 0 && movement.FlattenBackDash)
+                    dashForward = forwardFlat;
+                
+                return (dashForward * moveInput.y + right * moveInput.x).normalized;
+                
+            default:
+                return forward;
+        }
     }
 
     private Vector3 ApplyFriction(Vector3 horizontalVelocity)
@@ -139,9 +224,21 @@ public class PlayerController : MonoBehaviour
             return false;
     }
 
+    private bool TryConsumeDash()
+    {
+        if (_dashQueued && _dashCharge >= 1)
+        {
+            _dashQueued = false;
+            _dashCharge -= 1;
+            return true;
+        }
+        _dashQueued = false;
+        return false;
+    }
+
     private void CheckGround()
     {
-        if ((Time.time - _lastJumpTime) < movement.GroundIgnoreAfterJump)
+        if ((Time.time - _lastLeaveGroundTime) < movement.GroundIgnoreAfterJump)
         {
             _isGrounded = false;
             _groundNormal = Vector3.up;
@@ -192,6 +289,7 @@ public class PlayerController : MonoBehaviour
         return (origin, radius, distance);
     } 
     
-    // Reveal _isGrounded so it can be used in DevTools
+    // Reveal values so it can be used in DevTools
     public bool IsGrounded => _isGrounded;
+    public float DashCharge => _dashCharge;
 }

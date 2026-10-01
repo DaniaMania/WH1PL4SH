@@ -33,5 +33,7 @@ MonoBehaviour:
     m_Bits: 55
   maxDashCharges: 3
   dashRechargeTime: 3
-  dashSpeed: 1.5
+  dashSpeed: 20
   dashRedirect: 0
+  dashDirectionMode: 2
+  flattenBackDash: 0

@@ -8,6 +8,7 @@ public class DevTools : MonoBehaviour
     [SerializeField] private Key toggleWindowKey = Key.Backquote;
     [SerializeField] private Key respawnKey = Key.F;
     [SerializeField] private Key reloadSceneKey = Key.G;
+    
 
     [Header("References")]
     [SerializeField] private Rigidbody playerRb;
