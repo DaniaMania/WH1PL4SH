@@ -12,6 +12,7 @@ public class PlayerController : MonoBehaviour
 
     private bool _dashQueued;
     private float _dashCharge;
+    private float _dashEndTime;
     
     [Header("Player References")]
     [SerializeField] private CinemachineCamera playerCamera;
@@ -61,10 +62,20 @@ public class PlayerController : MonoBehaviour
         // Jumping application
         bool jumped = TryJump();
         
+        if (jumped)
+            _dashEndTime = Time.time;
+        
         // Dashing application
         bool dashed = TryConsumeDash();
+        
+        if (dashed)
+            _dashEndTime = Time.time + movement.DashDuration;
 
-        if (!dashed)
+        bool dashing = Time.time < _dashEndTime;
+
+        bool skipHorizontal = !dashed || (!dashing && movement.DashLocksMovement);
+
+        if (skipHorizontal)
         {
             if (_isGrounded && !jumped)
             {
@@ -95,12 +106,18 @@ public class PlayerController : MonoBehaviour
         }
         else if (_isGrounded)
             velocity.y = -(horizontalVelocity.x * _groundNormal.x + horizontalVelocity.z * _groundNormal.z) / _groundNormal.y;
+        else if (dashing)
+            velocity.y = velocity.y;
         else
             velocity.y -= movement.Gravity * Time.fixedDeltaTime;
         
         if (dashed)
         {
             Vector3 full = new Vector3(horizontalVelocity.x, velocity.y, horizontalVelocity.z);
+            
+            if (movement.DashCancelsFall && full.y < 0)
+                full.y = 0;
+            
             full = ApplyDash(full, GetDashDirection(_moveInput));
             
             horizontalVelocity = new Vector3(full.x, 0, full.z);
@@ -110,7 +127,7 @@ public class PlayerController : MonoBehaviour
             {
                 _lastLeaveGroundTime = Time.time;
             }
-        }
+        }   
         
         rb.linearVelocity = new Vector3(horizontalVelocity.x, velocity.y, horizontalVelocity.z);
     }

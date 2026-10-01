@@ -32,8 +32,11 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 55
   maxDashCharges: 3
-  dashRechargeTime: 0
+  dashRechargeTime: 1
   dashSpeed: 10
   dashRedirect: 1
   dashDirectionMode: 2
   flattenBackDash: 0
+  dashDuration: 0.2
+  dashCancelsFall: 1
+  dashLocksMovement: 1

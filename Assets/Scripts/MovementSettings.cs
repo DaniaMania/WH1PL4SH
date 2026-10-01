@@ -82,6 +82,9 @@ public class MovementSettings : ScriptableObject
     [SerializeField] private LayerMask groundLayers;
     public LayerMask GroundLayers => groundLayers;
     
+    
+    
+    
     [Header("Dash")]
     [Min(1), Tooltip("Number of dash charges.")]
     [SerializeField] private int maxDashCharges = 3;
@@ -107,4 +110,15 @@ public class MovementSettings : ScriptableObject
     [SerializeField] private bool flattenBackDash;
     public bool FlattenBackDash => flattenBackDash;
     
+    [Min(0), Tooltip("Seconds gravity is suspended after a dash. (s)")]
+    [SerializeField] private float dashDuration = .2f;
+    public float DashDuration => dashDuration;
+    
+    [Tooltip("Dashing stops any downward velocity.")]
+    [SerializeField] private bool dashCancelsFall;
+    public bool DashCancelsFall => dashCancelsFall;
+    
+    [Tooltip("No air strafing or ground friction while dashing.")]
+    [SerializeField] private bool dashLocksMovement = true;
+    public bool DashLocksMovement => dashLocksMovement;
 }
