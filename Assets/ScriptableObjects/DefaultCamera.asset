@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0ffabe0bb5d6da42a6fc044df0b99dc, type: 3}
+  m_Name: DefaultCamera
+  m_EditorClassIdentifier: Assembly-CSharp::CameraSettings
+  baseFOV: 60
+  maxFOV: 85
+  fovStartSpeed: 10
+  fovEndSpeed: 50
+  fovSmoothRate: 12
+  useTotalSpeed: 0
+  dashFovPunch: 10
+  dashPunchDecayRate: 50
+  effectsScale: 1

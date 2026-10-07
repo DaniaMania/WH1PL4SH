@@ -1,4 +1,5 @@
 using UnityEngine;
+public enum DashDirectionMode {FlatKeys, CameraLook, CameraRelativeKeys}
 
 [CreateAssetMenu(fileName = "MovementSettings", menuName = "Scriptable Objects/MovementSettings")]
 public class MovementSettings : ScriptableObject
@@ -20,16 +21,24 @@ public class MovementSettings : ScriptableObject
     [SerializeField] private float stopSpeed = 2.5f;
     public float StopSpeed => stopSpeed;
     
+    [Min(0), Tooltip("Amount of time that the player doesn't experience friction for after landing on the ground.")]
+    [SerializeField] private float landingGraceTime = 0.1f;
+    public float LandingGraceTime => landingGraceTime;
+    
     
     
     [Header("Air Movement")] 
-    [Range(0,10), Tooltip("Caps wish speed while airborne. Doesn't limit air speed. Raise for more speed gain when air-strafing.")]
+    [Range(0,10), Tooltip("Changes how forgiving the strafe angle is. Doesn't limit air speed.")]
     [SerializeField] private float airWishSpeedCap = 0.75f;
     public float AirWishSpeedCap => airWishSpeedCap;
     
     [Range(0, 10), Tooltip("Limits air braking and reversing.")]
     [SerializeField] private float airAcceleration = 4;
     public float AirAcceleration => airAcceleration;
+    
+    [Range(0, 1), Tooltip("How much speed from air strafing is kept. (1 = max, 0 = none)")]
+    [SerializeField] private float airSpeedGainScale = 1;
+    public float AirSpeedGainScale => airSpeedGainScale;
     
     
     
@@ -72,4 +81,44 @@ public class MovementSettings : ScriptableObject
     [Tooltip("Layers that count as ground.")]
     [SerializeField] private LayerMask groundLayers;
     public LayerMask GroundLayers => groundLayers;
+    
+    
+    
+    
+    [Header("Dash")]
+    [Min(1), Tooltip("Number of dash charges.")]
+    [SerializeField] private int maxDashCharges = 3;
+    public int MaxDashCharges => maxDashCharges;
+    
+    [Min(0), Tooltip("Seconds to refill one charge.")]
+    [SerializeField] private float dashRechargeTime = 1.5f;
+    public float DashRechargeTime => dashRechargeTime;
+    
+    [Min(0), Tooltip("Speed the dash adds. (m/s)")]
+    [SerializeField] private float dashSpeed = 10f;
+    public float DashSpeed => dashSpeed;
+    
+    [Tooltip("Off: the dash adds to your velocity (a back dash brakes). On: all your speed turns to the dash direction, plus dash speed")]
+    [SerializeField] private bool dashRedirect;
+    public bool DashRedirect => dashRedirect;
+
+    [Tooltip("Where the dash points")]
+    [SerializeField] private DashDirectionMode dashDirectionMode = DashDirectionMode.CameraRelativeKeys;
+    public DashDirectionMode DashDirectionMode => dashDirectionMode;
+    
+    [Tooltip("Backward dashes ignore camera pitch.")]
+    [SerializeField] private bool flattenBackDash;
+    public bool FlattenBackDash => flattenBackDash;
+    
+    [Min(0), Tooltip("Seconds gravity is suspended after a dash. (s)")]
+    [SerializeField] private float dashDuration = .2f;
+    public float DashDuration => dashDuration;
+    
+    [Tooltip("Dashing stops any downward velocity.")]
+    [SerializeField] private bool dashCancelsFall;
+    public bool DashCancelsFall => dashCancelsFall;
+    
+    [Tooltip("No air strafing or ground friction while dashing.")]
+    [SerializeField] private bool dashLocksMovement = true;
+    public bool DashLocksMovement => dashLocksMovement;
 }
