@@ -902,14 +902,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 180435702}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 790.3748, y: 0, z: 124.86095}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 747.48596, y: 0, z: 33.171417}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1355549477}
   - {fileID: 45455071}
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1747473907}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &208652887
 GameObject:
@@ -5242,7 +5242,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1434637578}
   m_Layer: 0
-  m_Name: ---- Camera & Chassis ----
+  m_Name: ---- Camera ----
   m_TagString: EditorOnly
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5479,6 +5479,38 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1560398753}
   m_CullTransparentMesh: 1
+--- !u!1 &1747473906
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1747473907}
+  m_Layer: 0
+  m_Name: ChassisUI
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1747473907
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1747473906}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 42.88888, y: 0, z: 91.68953}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 180435703}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1779255664
 GameObject:
   m_ObjectHideFlags: 0
@@ -6205,7 +6237,7 @@ SceneRoots:
   - {fileID: 414018777}
   - {fileID: 2022460722}
   - {fileID: 1213684257}
-  - {fileID: 180435703}
+  - {fileID: 1747473907}
   - {fileID: 680634298}
   - {fileID: 503541176}
   - {fileID: 1427965322}
