@@ -14,12 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MovementSettings
   groundWishSpeed: 10
   groundAcceleration: 10
-  friction: 2
+  friction: 1
   stopSpeed: 2.5
   landingGraceTime: 2.5
   airWishSpeedCap: 5
   airAcceleration: 10
-  airSpeedGainScale: 0.5
+  airSpeedGainScale: 1
   jumpHeight: 1.2
   jumpBufferTime: 0.2
   gravity: 20
