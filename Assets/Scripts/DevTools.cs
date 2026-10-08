@@ -19,7 +19,7 @@ public class DevTools : MonoBehaviour
     [SerializeField, Min(0.05f)] private float fpsRefreshInterval = 0.25f;
 
     private bool _windowVisible;
-    private readonly Rect _windowRect = new Rect(20, 20, 230, 0);
+    private readonly Rect _windowRect = new Rect(10, 10, 230, 0);
 
     private float _fps;
     private float _fpsTimer;
@@ -46,7 +46,10 @@ public class DevTools : MonoBehaviour
         Keyboard kb = Keyboard.current;
         if (kb != null)
         {
-            if (kb[toggleWindowKey].wasPressedThisFrame) _windowVisible = !_windowVisible;
+            if (kb[toggleWindowKey].wasPressedThisFrame)
+            {
+                _windowVisible = !_windowVisible;
+            }
             if (kb[respawnKey].wasPressedThisFrame) RespawnPlayer();
             if (kb[reloadSceneKey].wasPressedThisFrame) ReloadActiveScene();
         }

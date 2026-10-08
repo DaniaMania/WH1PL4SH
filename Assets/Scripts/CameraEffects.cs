@@ -5,8 +5,8 @@ public class CameraEffects : MonoBehaviour
 {
     [SerializeField] private CameraSettings cameraSettings;
     [SerializeField] private PlayerController playerController;
-    [SerializeField] private CinemachineImpulseSource impulseSource;
     [SerializeField] private CinemachineCamera playerCamera;
+    [SerializeField] private Camera playerUICamera;
 
     private float _currentFOV;
     private float _dashPunch;
@@ -24,6 +24,7 @@ public class CameraEffects : MonoBehaviour
         _currentFOV = Mathf.Lerp(_currentFOV, target, 1 - Mathf.Exp(-cameraSettings.FovSmoothRate * Time.deltaTime));
         _dashPunch = Mathf.MoveTowards(_dashPunch, 0, cameraSettings.DashPunchDecayRate * Time.deltaTime);
         playerCamera.Lens.FieldOfView = _currentFOV;
+        playerUICamera.fieldOfView = _currentFOV;
     }
     
     void HandleDashed(Vector3 dashDirection)
