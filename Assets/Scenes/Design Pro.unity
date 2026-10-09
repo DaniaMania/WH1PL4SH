@@ -629,6 +629,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3808d94ece8cbce4692fe0218230367f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UIMotion
+  playerBody: {fileID: 131247119}
   playerController: {fileID: 131247123}
   uiMotionSettings: {fileID: 11400000, guid: 6ab32c8baf9a3114f8ec019930b41161, type: 2}
 --- !u!1 &131247117

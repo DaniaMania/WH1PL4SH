@@ -19,3 +19,8 @@ MonoBehaviour:
   maxSway: 0.03
   fullRetreatSpeed: 40
   maxRetreatDist: 0.15
+  landingDip: 0.02
+  landingReturnSpeed: 0.3
+  startFallSpeed: 8
+  fallFlexPerAcceleration: 0.001
+  fallFlexSettleTime: 0.15
