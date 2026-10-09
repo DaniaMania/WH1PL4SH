@@ -129,7 +129,6 @@ GameObject:
   m_Component:
   - component: {fileID: 45455071}
   - component: {fileID: 45455074}
-  - component: {fileID: 45455073}
   - component: {fileID: 45455072}
   m_Layer: 8
   m_Name: DashMeterCamera
@@ -197,14 +196,6 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
---- !u!81 &45455073
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 45455070}
-  m_Enabled: 1
 --- !u!20 &45455074
 Camera:
   m_ObjectHideFlags: 0
@@ -599,6 +590,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 79845455}
+  - component: {fileID: 79845456}
   m_Layer: 8
   m_Name: Screens
   m_TagString: Untagged
@@ -617,7 +609,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 142088653}
   - {fileID: 995951588}
@@ -625,6 +617,20 @@ Transform:
   - {fileID: 337575443}
   m_Father: {fileID: 823382511}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &79845456
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 79845454}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3808d94ece8cbce4692fe0218230367f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UIMotion
+  playerController: {fileID: 131247123}
+  uiMotionSettings: {fileID: 11400000, guid: 6ab32c8baf9a3114f8ec019930b41161, type: 2}
 --- !u!1 &131247117
 GameObject:
   m_ObjectHideFlags: 0
@@ -887,6 +893,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 180435703}
+  - component: {fileID: 180435704}
   m_Layer: 0
   m_Name: DashMeterComponent
   m_TagString: Untagged
@@ -911,6 +918,23 @@ Transform:
   - {fileID: 45455071}
   m_Father: {fileID: 1747473907}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &180435704
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 180435702}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7de9b145888d2a34e8a13dc32a4c326c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DashMeterUI
+  playerController: {fileID: 131247123}
+  dashCharges:
+  - {fileID: 424117459}
+  - {fileID: 690050100}
+  - {fileID: 893398393}
 --- !u!1 &208652887
 GameObject:
   m_ObjectHideFlags: 0
@@ -2802,7 +2826,6 @@ GameObject:
   m_Component:
   - component: {fileID: 823382511}
   - component: {fileID: 823382514}
-  - component: {fileID: 823382513}
   - component: {fileID: 823382512}
   m_Layer: 0
   m_Name: UI Camera
@@ -2822,7 +2845,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 79845455}
   m_Father: {fileID: 330585546}
@@ -2871,14 +2894,6 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
---- !u!81 &823382513
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 823382510}
-  m_Enabled: 1
 --- !u!20 &823382514
 Camera:
   m_ObjectHideFlags: 0
@@ -3686,7 +3701,6 @@ GameObject:
   - component: {fileID: 1213684256}
   - component: {fileID: 1213684255}
   - component: {fileID: 1213684254}
-  - component: {fileID: 1213684258}
   m_Layer: 5
   m_Name: PlayerUI
   m_TagString: Untagged
@@ -3778,23 +3792,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
---- !u!114 &1213684258
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1213684253}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7de9b145888d2a34e8a13dc32a4c326c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DashMeterUI
-  playerController: {fileID: 131247123}
-  dashCharges:
-  - {fileID: 424117459}
-  - {fileID: 690050100}
-  - {fileID: 893398393}
 --- !u!1 &1219199307
 GameObject:
   m_ObjectHideFlags: 0
@@ -6028,7 +6025,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1934378667
 RectTransform:
   m_ObjectHideFlags: 0
