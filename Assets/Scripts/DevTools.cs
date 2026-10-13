@@ -34,7 +34,6 @@ public class DevTools : MonoBehaviour
     {
         if (playerRb == null) return;
 
-        // Falls back to the controller on the same object as the Rigidbody if not assigned
         if (playerController == null) playerController = playerRb.GetComponent<PlayerController>();
 
         _startPosition = playerRb.position;
@@ -57,7 +56,6 @@ public class DevTools : MonoBehaviour
         UpdateFps();
     }
 
-    // Averages over an interval so the number is readable instead of flickering every frame
     private void UpdateFps()
     {
         _fpsFrames++;
@@ -107,25 +105,19 @@ public class DevTools : MonoBehaviour
         GUILayout.Label($"[{reloadSceneKey}]  Reload Scene", _labelStyle);
     }
 
-    // Teleports the Rigidbody and kills all momentum so you don't carry fall speed into the spawn
     private void RespawnPlayer()
     {
-        if (playerRb == null)
-        {
-            Debug.LogWarning("DevTools: assign Player Rb to use respawn.");
-            return;
-        }
-
         Vector3 pos = playerSpawn != null ? playerSpawn.position : _startPosition;
         Quaternion rot = playerSpawn != null ? playerSpawn.rotation : _startRotation;
 
         playerRb.linearVelocity = Vector3.zero;
         playerRb.angularVelocity = Vector3.zero;
 
-        // Set both so the move is immediate this frame and the physics body agrees with it
         playerRb.position = pos;
         playerRb.rotation = rot;
         playerRb.transform.SetPositionAndRotation(pos, rot);
+
+        SpeedrunTrigger.ResetTimer();
     }
 
     private void ReloadActiveScene()
