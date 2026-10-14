@@ -84,8 +84,8 @@ public class DevTools : MonoBehaviour
         if (playerRb != null)
         {
             Vector3 v = playerRb.linearVelocity;
-            GUILayout.Label($"Speed  {new Vector2(v.x, v.z).magnitude:0.00} u/s", _labelStyle);
-            GUILayout.Label($"Vert   {v.y:0.00} u/s", _labelStyle);
+            GUILayout.Label($"Speed  {new Vector2(v.x, v.z).magnitude:0.00} m/s", _labelStyle);
+            GUILayout.Label($"Vert   {v.y:0.00} m/s", _labelStyle);
         }
         else
         {

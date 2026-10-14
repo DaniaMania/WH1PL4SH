@@ -33347,6 +33347,7 @@ GameObject:
   - component: {fileID: 131247120}
   - component: {fileID: 131247119}
   - component: {fileID: 131247123}
+  - component: {fileID: 131247124}
   m_Layer: 6
   m_Name: Player
   m_TagString: Player
@@ -33496,6 +33497,20 @@ MonoBehaviour:
   moveAction: {fileID: -1680190386980627800, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   jumpAction: {fileID: -2099379676528639254, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   dashAction: {fileID: -7471211009204490832, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+--- !u!114 &131247124
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 131247117}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94511ab4c516d0c4dab90fdf4c11d8e0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerStateRecorder
+  playerController: {fileID: 131247123}
+  playerRb: {fileID: 131247119}
 --- !u!43 &131554942
 Mesh:
   m_ObjectHideFlags: 0
