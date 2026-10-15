@@ -33348,6 +33348,7 @@ GameObject:
   - component: {fileID: 131247119}
   - component: {fileID: 131247123}
   - component: {fileID: 131247124}
+  - component: {fileID: 131247125}
   m_Layer: 6
   m_Name: Player
   m_TagString: Player
@@ -33511,6 +33512,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerStateRecorder
   playerController: {fileID: 131247123}
   playerRb: {fileID: 131247119}
+--- !u!114 &131247125
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 131247117}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d60806568dcbc4ea582459326a120385, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CoilbackRewind
+  playerController: {fileID: 131247123}
+  playerRb: {fileID: 131247119}
+  playerStateRecorder: {fileID: 131247124}
+  rewindAction: {fileID: -7302680256248004627, guid: 052faaac586de48259a63d0c4782560b, type: 3}
 --- !u!43 &131554942
 Mesh:
   m_ObjectHideFlags: 0
