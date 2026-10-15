@@ -22,6 +22,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Rigidbody rb;
     [SerializeField] private MovementSettings movement;
     [SerializeField] private CapsuleCollider playerCapsuleCollider;
+    [SerializeField] private CoilbackRewind coilback;
     
     [Header("Movement Inputs")]
     [SerializeField] private InputActionReference moveAction;
@@ -39,12 +40,12 @@ public class PlayerController : MonoBehaviour
     {
         _moveInput = moveAction.action.ReadValue<Vector2>();
         
-        if (jumpAction.action.WasPressedThisFrame())
+        if (jumpAction.action.WasPressedThisFrame() && !coilback.IsRewinding)
         {
             _bufferTimer = movement.JumpBufferTime;
         }
 
-        if (dashAction.action.WasPressedThisFrame())
+        if (dashAction.action.WasPressedThisFrame() && !coilback.IsRewinding)
         {
             _dashQueued = true;
         }
@@ -52,91 +53,95 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
-        // Dash recharging over time
-        _dashCharge = Mathf.Min(_dashCharge + Time.fixedDeltaTime/movement.DashRechargeTime, movement.MaxDashCharges);
-        
-        Vector3 wishDirection = GetWishDirection(_moveInput);
-        
-        Vector3 velocity = rb.linearVelocity;
-        Vector3 horizontalVelocity = new Vector3(velocity.x, 0, velocity.z);
-        
-        CheckGround();
-
-        // Jumping application
-        bool jumped = TryJump();
-        
-        if (jumped)
-            _dashEndTime = Time.time;
-        
-        // Dashing application
-        bool dashed = TryConsumeDash();
-        
-        if (dashed)
-            _dashEndTime = Time.time + movement.DashDuration;
-
-        bool dashing = Time.time < _dashEndTime;
-
-        bool skipHorizontal = dashed || (dashing && movement.DashLocksMovement);
-
-        if (!skipHorizontal)
+        if (!coilback.IsRewinding)
         {
-            if (_isGrounded && !jumped)
-            {
-                horizontalVelocity = ApplyFriction(horizontalVelocity);
-                horizontalVelocity = Accelerate(horizontalVelocity, wishDirection, movement.GroundWishSpeed, movement.GroundWishSpeed, movement.GroundAcceleration);
-            }
-            else
-            {
-                float oldSpeed = horizontalVelocity.magnitude;
-                Vector3 newVelocity = Accelerate(horizontalVelocity, wishDirection, Mathf.Min(movement.AirWishSpeedCap, movement.GroundWishSpeed), movement.GroundWishSpeed, movement.AirAcceleration);
-                float newSpeed = newVelocity.magnitude;
+            // Dash recharging over time
+            if (_isGrounded)
+                _dashCharge = Mathf.Min(_dashCharge + Time.fixedDeltaTime/movement.DashRechargeTime, movement.MaxDashCharges);
+        
+            Vector3 wishDirection = GetWishDirection(_moveInput);
+        
+            Vector3 velocity = rb.linearVelocity;
+            Vector3 horizontalVelocity = new Vector3(velocity.x, 0, velocity.z);
+        
+            CheckGround();
 
-                if (newSpeed > oldSpeed)
+            // Jumping application
+            bool jumped = TryJump();
+            
+            if (jumped)
+                _dashEndTime = Time.time;
+            
+            // Dashing application
+            bool dashed = TryConsumeDash();
+            
+            if (dashed)
+                _dashEndTime = Time.time + movement.DashDuration;
+
+            bool dashing = Time.time < _dashEndTime;
+
+            bool skipHorizontal = dashed || (dashing && movement.DashLocksMovement);
+
+            if (!skipHorizontal)
+            {
+                if (_isGrounded && !jumped)
                 {
-                    float keptSpeed = oldSpeed + movement.AirSpeedGainScale * (newSpeed - oldSpeed);
-                    newVelocity = newVelocity * (keptSpeed / newSpeed);
+                    horizontalVelocity = ApplyFriction(horizontalVelocity);
+                    horizontalVelocity = Accelerate(horizontalVelocity, wishDirection, movement.GroundWishSpeed, movement.GroundWishSpeed, movement.GroundAcceleration);
                 }
-            
-                horizontalVelocity = newVelocity;
+                else
+                {
+                    float oldSpeed = horizontalVelocity.magnitude;
+                    Vector3 newVelocity = Accelerate(horizontalVelocity, wishDirection, Mathf.Min(movement.AirWishSpeedCap, movement.GroundWishSpeed), movement.GroundWishSpeed, movement.AirAcceleration);
+                    float newSpeed = newVelocity.magnitude;
+
+                    if (newSpeed > oldSpeed)
+                    {
+                        float keptSpeed = oldSpeed + movement.AirSpeedGainScale * (newSpeed - oldSpeed);
+                        newVelocity *= (keptSpeed / newSpeed);
+                    }
+                
+                    horizontalVelocity = newVelocity;
+                }
             }
-        }
 
-        if (jumped)
-        {
-            _lastLeaveGroundTime = Time.time;
-            float jumpVelocity = Mathf.Sqrt(2 * movement.Gravity * movement.JumpHeight);
-            velocity.y = jumpVelocity;
-        }
-        else if (_isGrounded)
-            velocity.y = -(horizontalVelocity.x * _groundNormal.x + horizontalVelocity.z * _groundNormal.z) / _groundNormal.y;
-        else if (dashing)
-            velocity.y = velocity.y;
-        else
-            velocity.y -= movement.Gravity * Time.fixedDeltaTime;
-        
-        if (dashed)
-        {
-            Vector3 full = new Vector3(horizontalVelocity.x, velocity.y, horizontalVelocity.z);
-            
-            if (movement.DashCancelsFall && full.y < 0)
-                full.y = 0;
-
-            Vector3 dashDirection = GetDashDirection(_moveInput);
-            
-            Dashed?.Invoke(dashDirection);
-            
-            full = ApplyDash(full, dashDirection);
-            
-            horizontalVelocity = new Vector3(full.x, 0, full.z);
-            velocity.y = full.y;
-            
-            if (velocity.y > 0)
+            if (jumped)
             {
                 _lastLeaveGroundTime = Time.time;
+                float jumpVelocity = Mathf.Sqrt(2 * movement.Gravity * movement.JumpHeight);
+                velocity.y = jumpVelocity;
             }
-        }   
-        
-        rb.linearVelocity = new Vector3(horizontalVelocity.x, velocity.y, horizontalVelocity.z);
+            else if (_isGrounded)
+                velocity.y = -(horizontalVelocity.x * _groundNormal.x + horizontalVelocity.z * _groundNormal.z) / _groundNormal.y;
+            else if (dashing)
+                velocity.y = velocity.y;
+            else
+                velocity.y -= movement.Gravity * Time.fixedDeltaTime;
+            
+            if (dashed)
+            {
+                Vector3 full = new Vector3(horizontalVelocity.x, velocity.y, horizontalVelocity.z);
+                
+                if (movement.DashCancelsFall && full.y < 0)
+                    full.y = 0;
+
+                Vector3 dashDirection = GetDashDirection(_moveInput);
+                
+                Dashed?.Invoke(dashDirection);
+                
+                full = ApplyDash(full, dashDirection);
+                
+                horizontalVelocity = new Vector3(full.x, 0, full.z);
+                velocity.y = full.y;
+                
+                if (velocity.y > 0)
+                {
+                    _lastLeaveGroundTime = Time.time;
+                }
+            }   
+            
+            rb.linearVelocity = new Vector3(horizontalVelocity.x, velocity.y, horizontalVelocity.z);
+        }
     }
     
     private Vector3 ApplyDash(Vector3 full, Vector3 direction)
