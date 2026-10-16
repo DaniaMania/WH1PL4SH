@@ -29,15 +29,9 @@ public class CoilbackRewind : MonoBehaviour
         if (_isRewinding && _newPlayerSequence > 1 && _coilbackCharge > 0)
         {
             // Debug.Log("Current Position: " + playerStateRecorder.PlayerPosition(playerStateRecorder.CurrentPlayerSequence()));
-            // player state debug log
-
             //Debug.Log("Current Velocity: " + playerStateRecorder.PlayerVelocity());
             //Debug.Log("Current Dash Bar Amount: " + playerStateRecorder.DashBarAmount());
             //Debug.Log("Current Time: " + playerStateRecorder.CurrentTimeElapsed());
-
-            // rewinding code
-
-            // rewind player position
 
             playerRb.isKinematic = true;
             playerRb.MovePosition(playerStateRecorder.PlayerPosition(_newPlayerSequence));

@@ -258044,9 +258044,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: '         Demo Build V2
-
-'
+  m_text: '         Demo Build V3'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 191dd936a2d93f148b150fa982679c93, type: 2}
   m_sharedMaterial: {fileID: -4324913905552013600, guid: 191dd936a2d93f148b150fa982679c93, type: 2}
@@ -260992,7 +260990,7 @@ GameObject:
   - component: {fileID: 1132781410}
   - component: {fileID: 1132781409}
   m_Layer: 5
-  m_Name: Devtools Key
+  m_Name: KeybindsText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -261042,6 +261040,8 @@ MonoBehaviour:
     jump:[space]
 
     dash:[shift]
+
+    coilback:[e]
 
     devtools:[tab]'
   m_isRightToLeft: 0

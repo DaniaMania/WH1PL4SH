@@ -2,17 +2,21 @@ using System;
 using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Collections;
 
 public class PlayerController : MonoBehaviour
 {
     private Vector2 _moveInput;
     private bool _isGrounded;
+    private bool _dashRechargeable;
     private Vector3 _groundNormal;
     private float _lastLeaveGroundTime;
     private float _bufferTimer;
 
     private bool _dashQueued;
     private float _dashCharge;
+    private bool _dashRechargeableDurationIsRunning;
+    private bool _slowDashState;
     private float _dashEndTime;
     
     public event Action<Vector3> Dashed;
@@ -50,6 +54,17 @@ public class PlayerController : MonoBehaviour
             _dashQueued = true;
         }
     }
+    
+    private IEnumerator DashRechargeableDuration()
+    {
+        _dashRechargeableDurationIsRunning = true;
+        Debug.Log("Coroutine Started");
+        yield return new WaitForSeconds(5f);
+        
+        _dashRechargeableDurationIsRunning = false;
+        _slowDashState = true;
+        Debug.Log("Coroutine Stopped (by duration)");
+    }
 
     void FixedUpdate()
     {
@@ -57,7 +72,28 @@ public class PlayerController : MonoBehaviour
         {
             // Dash recharging over time
             if (_isGrounded)
+            {
+                if (_dashRechargeableDurationIsRunning)
+                {
+                    StopCoroutine("DashRechargeableDuration");
+                    
+                    _dashRechargeableDurationIsRunning = false;
+                    _slowDashState = false;
+                    Debug.Log("Coroutine Stopped (by grounding)");
+                }
                 _dashCharge = Mathf.Min(_dashCharge + Time.fixedDeltaTime/movement.DashRechargeTime, movement.MaxDashCharges);
+            }
+            else
+            {
+                if (!_dashRechargeableDurationIsRunning)
+                {
+                    StartCoroutine("DashRechargeableDuration");
+                }
+                else if (!_slowDashState)
+                    _dashCharge = Mathf.Min(_dashCharge + Time.fixedDeltaTime/movement.DashRechargeTime, movement.MaxDashCharges);
+                else
+                    _dashCharge = Mathf.Min(_dashCharge + Time.fixedDeltaTime/movement.DashRechargeTimeSlow, movement.MaxDashCharges);
+            }
         
             Vector3 wishDirection = GetWishDirection(_moveInput);
         

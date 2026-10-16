@@ -90,9 +90,13 @@ public class MovementSettings : ScriptableObject
     [SerializeField] private int maxDashCharges = 3;
     public int MaxDashCharges => maxDashCharges;
     
-    [Min(0), Tooltip("Seconds to refill one charge.")]
+    [Min(0), Tooltip("Seconds to refill one charge normally.")]
     [SerializeField] private float dashRechargeTime = 1.5f;
     public float DashRechargeTime => dashRechargeTime;
+    
+    [Min(0), Tooltip("Seconds to refill one charge when penalized.")]
+    [SerializeField] private float dashRechargeTimeSlow = 3f;
+    public float DashRechargeTimeSlow => dashRechargeTimeSlow;
     
     [Min(0), Tooltip("Speed the dash adds. (m/s)")]
     [SerializeField] private float dashSpeed = 10f;

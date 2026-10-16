@@ -19,12 +19,16 @@ public class CoilbackMeterUI : MonoBehaviour
     
     void Update()
     {
+        // How much the bar is filled (through fill amount) is determined by the Coilback current charge clamped to between 0 and 1
         float fillAmount = Mathf.Clamp01(coilbackRewind.CoilBackCharge/coilback.CoilBackMaxCharge);
 
+        // Truncate the numeric Coilback charge so that it displays as a whole number
         coilbackMeterText.text = ((int)coilbackRewind.CoilBackCharge).ToString();
             
         Color currentColor = coilbackMeter.color;
 
+        
+        // Opacity of the Coilback bar being lower if under 25% (unusable under 25%)
         if (fillAmount >= 0.25f)
         {
             currentColor.a = _usableOpacity;
@@ -33,6 +37,7 @@ public class CoilbackMeterUI : MonoBehaviour
         {
             currentColor.a = _unUsableOpacity;
         }
+        
         coilbackMeter.fillAmount = fillAmount;
         coilbackMeter.color = currentColor;
     }
