@@ -1,3 +1,5 @@
+using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -6,6 +8,7 @@ using DG.Tweening;
 public class CoilbackRewind : MonoBehaviour
 {
     private bool _isRewinding;
+    private bool _rewindOnCooldown;
     private int _newPlayerSequence;
     private float _coilbackCharge;
     
@@ -23,15 +26,31 @@ public class CoilbackRewind : MonoBehaviour
     [Header("Coilback Settings")]
     [SerializeField] private CoilbackSettings coilback;
 
-    private void Start()
+    private void Awake()
     {
+        // Set Coilback charge to max on awake
         _coilbackCharge = coilback.CoilBackMaxCharge;
+        
+        // Checking the rewind action key if it is pressed or released
+        rewindAction.action.performed += OnRewind;
+        rewindAction.action.canceled += OnRewind;
+    }
+    
+    // OnEnable/Disable so that Unity doesn't check for keyboard inputs when Coilback isn't relevant
+    private void OnEnable()
+    {
+        rewindAction.action.Enable();
+    }
+
+    private void OnDisable()
+    {
+        rewindAction.action.Disable();
     }
 
     private void FixedUpdate()
     {
-        // Check if the player is rewinding and there is a previous sequence to play and the Coilback has charge
-        if (_isRewinding && _newPlayerSequence > 1 && _coilbackCharge > 0)
+        // Check if the player is rewinding and there is a previous sequence to play and the Coilback has charge and the Coilback is not on cooldown
+        if (_isRewinding && _newPlayerSequence > 1 && _coilbackCharge > 0 && !_rewindOnCooldown)
         {
             // Set player to isKinematic so physics doesn't apply during rewind
             playerRb.isKinematic = true;
@@ -48,40 +67,32 @@ public class CoilbackRewind : MonoBehaviour
         }
         else
         {
-            CoilbackStopped();
-            
             // Coilback charges on FixedUpdate while not using it
             if (_coilbackCharge < coilback.CoilBackMaxCharge)
                 _coilbackCharge += Time.fixedDeltaTime / (coilback.CoilbackRechargeTime / 100);
         }
     }
 
-    private void OnEnable()
+    // Rewind key pressed
+    private void OnRewind(InputAction.CallbackContext context)
     {
-        // Rewind key pressed
-        rewindAction.action.started += OnRewindStarted;
-        
-        // Rewind key released
-        rewindAction.action.canceled += OnRewindReleased;
-    }
-
-    // Runs when rewind key is pressed
-    private void OnRewindStarted(InputAction.CallbackContext context)
-    {
-        if (_coilbackCharge >= coilback.CoilBackMaxCharge * 0.25f)
+        // Runs when key is held down
+        if (context.performed && !_rewindOnCooldown)
         {
-            _newPlayerSequence = playerStateRecorder.CurrentPlayerSequence();
-            _isRewinding = true;
+            if (_coilbackCharge >= coilback.CoilBackMaxCharge * 0.25f)
+            {
+                _newPlayerSequence = playerStateRecorder.CurrentPlayerSequence();
+                _isRewinding = true;
             
-            // Fades in the rewinding overlay (temporary)
-            rewindOverlay.DOFade(0.1f, 1.0f);
+                // Fades in the rewinding overlay (temporary)
+                rewindOverlay.DOFade(0.1f, 1.0f);
+            }
         }
-    }
-
-    // Runs when rewind key is released
-    private void OnRewindReleased(InputAction.CallbackContext context)
-    {
-        CoilbackStopped();
+        // Runs when key is released
+        else if (context.canceled && _isRewinding)
+        {
+            CoilbackStopped();
+        }
     }
 
     // Method for anything that happens when Coilback is stopped
@@ -92,9 +103,20 @@ public class CoilbackRewind : MonoBehaviour
         
         // Fades out the rewinding overlay if the Coilback is stopped for any reason (temporary)
         rewindOverlay.DOFade(0, 1.0f);
-        
+
+        StartCoroutine(CoilbackCooldown());
+        Debug.Log("Rewind On Cooldown");
+
         // TODO launching player code
-        
+
+    }
+    
+    // Coroutine for Coilback Cooldown
+    private IEnumerator CoilbackCooldown()
+    {
+        _rewindOnCooldown = true;
+        yield return new WaitForSeconds(coilback.CoilbackCooldownDuration);
+        _rewindOnCooldown = false;
     }
 
     // Public setters for PlayerController to read

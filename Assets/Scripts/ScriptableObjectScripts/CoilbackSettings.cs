@@ -15,4 +15,8 @@ public class CoilbackSettings : ScriptableObject
     [Min(0), Tooltip("How much the Coilback charge decreases per fixed updated tick.")]
     [SerializeField] private float coilbackDecreaseAmount = 1f;
     public float CoilbackDecreaseAmount => coilbackDecreaseAmount;
+    
+    [Min(0), Tooltip("How long the cooldown for the Coilback is. (s)")]
+    [SerializeField] private float coilbackCooldownDuration = 3f;
+    public float CoilbackCooldownDuration => coilbackCooldownDuration;
 }
