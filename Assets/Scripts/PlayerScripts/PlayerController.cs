@@ -146,9 +146,7 @@ public class PlayerController : MonoBehaviour
             }
             else if (_isGrounded)
                 velocity.y = -(horizontalVelocity.x * _groundNormal.x + horizontalVelocity.z * _groundNormal.z) / _groundNormal.y;
-            else if (dashing)
-                velocity.y = velocity.y;
-            else
+            else if (!dashing)
                 velocity.y -= movement.Gravity * Time.fixedDeltaTime;
             
             if (dashed)

@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de6923941d65e437594b20922fa9b408, type: 3}
   m_Name: DefaultCoilback
   m_EditorClassIdentifier: Assembly-CSharp::CoilbackSettings
-  coilbackRechargeTime: 0.1
+  coilbackRechargeTime: 10
   coilBackMaxCharge: 100
   coilbackDecreaseAmount: 1

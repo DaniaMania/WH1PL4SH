@@ -1,6 +1,7 @@
-using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
+using DG.Tweening;
 
 public class CoilbackRewind : MonoBehaviour
 {
@@ -12,6 +13,9 @@ public class CoilbackRewind : MonoBehaviour
     [SerializeField] private PlayerController playerController;
     [SerializeField] private Rigidbody playerRb;
     [SerializeField] private PlayerStateRecorder playerStateRecorder;
+    
+    [Header("UI References")]
+    [SerializeField] private Image rewindOverlay;
     
     [Header("Rewind Input")]
     [SerializeField] private InputActionReference rewindAction;
@@ -48,11 +52,9 @@ public class CoilbackRewind : MonoBehaviour
             
             // Coilback charges on FixedUpdate while not using it
             if (_coilbackCharge < coilback.CoilBackMaxCharge)
-                _coilbackCharge += Time.fixedDeltaTime / coilback.CoilbackRechargeTime;
+                _coilbackCharge += Time.fixedDeltaTime / (coilback.CoilbackRechargeTime / 100);
         }
     }
-    
-    
 
     private void OnEnable()
     {
@@ -70,6 +72,9 @@ public class CoilbackRewind : MonoBehaviour
         {
             _newPlayerSequence = playerStateRecorder.CurrentPlayerSequence();
             _isRewinding = true;
+            
+            // Fades in the rewinding overlay (temporary)
+            rewindOverlay.DOFade(0.1f, 1.0f);
         }
     }
 
@@ -84,7 +89,11 @@ public class CoilbackRewind : MonoBehaviour
     {
         _isRewinding = false;
         playerRb.isKinematic = false;
-        // launching player code
+        
+        // Fades out the rewinding overlay if the Coilback is stopped for any reason (temporary)
+        rewindOverlay.DOFade(0, 1.0f);
+        
+        // TODO launching player code
         
     }
 

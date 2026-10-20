@@ -35,7 +35,7 @@ public class DashMeterUI : MonoBehaviour
             else
             {
                 // If less than 1 then it is red and recharging opacity
-                currentColor = Color.red;
+                currentColor = Color.lightCoral;
                 currentColor.a = _rechargingOpacity;
             }
             dashCharges[i].fillAmount = fillAmount;

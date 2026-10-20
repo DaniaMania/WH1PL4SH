@@ -4,7 +4,7 @@ using UnityEngine;
 public class CoilbackSettings : ScriptableObject
 {
     [Header("Coilback")]
-    [Min(0), Tooltip("Seconds to refill the Coilback meter.")]
+    [Min(0), Tooltip("Time it takes to fully refill the Coilback meter from min to max. (s)")]
     [SerializeField] private float coilbackRechargeTime = 10f;
     public float CoilbackRechargeTime => coilbackRechargeTime;
     

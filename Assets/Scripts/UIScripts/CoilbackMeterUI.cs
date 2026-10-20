@@ -1,6 +1,7 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using DG.Tweening;
 
 public class CoilbackMeterUI : MonoBehaviour
 {
@@ -15,11 +16,12 @@ public class CoilbackMeterUI : MonoBehaviour
     [SerializeField] private CoilbackSettings coilback;
     
     private float _usableOpacity = 1f;
-    private float _unUsableOpacity = 0.3f;
+    private float _unUsableOpacity = 0.5f;
     private Color _storedColor;
 
     void Start()
     {
+        // Store the color of the Coilback meter immediately
         _storedColor = coilbackMeter.color;
     }
     
@@ -32,17 +34,16 @@ public class CoilbackMeterUI : MonoBehaviour
         coilbackMeterText.text = ((int)coilbackRewind.CoilBackCharge).ToString();
             
         Color currentColor = coilbackMeter.color;
-
         
         // Opacity of the Coilback bar being lower if under 25% (unusable under 25%)
-        if (fillAmount >= 0.25f)
+        if (fillAmount >= 0.25f || coilbackRewind.IsRewinding)
         {
-            currentColor.a = _usableOpacity;
             currentColor = _storedColor;
+            currentColor.a = _usableOpacity;
         }
         else
         {
-            currentColor = Color.red;
+            currentColor = Color.lightCoral;
             currentColor.a = _unUsableOpacity;
         }
         
