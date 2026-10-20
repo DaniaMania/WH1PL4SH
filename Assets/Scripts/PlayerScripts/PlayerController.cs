@@ -54,43 +54,40 @@ public class PlayerController : MonoBehaviour
             _dashQueued = true;
         }
     }
-    
-    private IEnumerator DashRechargeableDuration()
-    {
-        _dashRechargeableDurationIsRunning = true;
-        Debug.Log("Coroutine Started");
-        yield return new WaitForSeconds(5f);
-        
-        _dashRechargeableDurationIsRunning = false;
-        _slowDashState = true;
-        Debug.Log("Coroutine Stopped (by duration)");
-    }
 
     void FixedUpdate()
     {
+        // If Coilback is rewinding, nothing here can happen
         if (!coilback.IsRewinding)
         {
-            // Dash recharging over time
+            // If the player is grounded dash recharges over time at the default rate (DashRechargeTime)
             if (_isGrounded)
             {
+                // If dash rechargeable duration is running and the player grounds, the coroutine stops
                 if (_dashRechargeableDurationIsRunning)
                 {
                     StopCoroutine("DashRechargeableDuration");
                     
                     _dashRechargeableDurationIsRunning = false;
                     _slowDashState = false;
-                    Debug.Log("Coroutine Stopped (by grounding)");
                 }
+                
+                // Dash recharging over time (normal speed of DashRechargeTime)
                 _dashCharge = Mathf.Min(_dashCharge + Time.fixedDeltaTime/movement.DashRechargeTime, movement.MaxDashCharges);
             }
             else
             {
+                // If the player isn't grounded and dash rechargeable duration is not running, start the coroutine
                 if (!_dashRechargeableDurationIsRunning)
                 {
                     StartCoroutine("DashRechargeableDuration");
                 }
+                
+                // If the player is in slowDashState (set by the coroutine) the dash recharges at DashRechargeTimeSlow
                 else if (!_slowDashState)
                     _dashCharge = Mathf.Min(_dashCharge + Time.fixedDeltaTime/movement.DashRechargeTime, movement.MaxDashCharges);
+                
+                // While the coroutine is running and the player isn't in slow mode yet, recharge at the normal speed
                 else
                     _dashCharge = Mathf.Min(_dashCharge + Time.fixedDeltaTime/movement.DashRechargeTimeSlow, movement.MaxDashCharges);
             }
@@ -190,6 +187,16 @@ public class PlayerController : MonoBehaviour
         }
 
         return (full + direction * movement.DashSpeed);
+    }
+    
+    // Coroutine for checking how long the player can be not grounded while recharging dash at the default rate (DashRechargeTime)
+    private IEnumerator DashRechargeableDuration()
+    {
+        _dashRechargeableDurationIsRunning = true;
+        yield return new WaitForSeconds(movement.DurationUntilSlowRecharge);
+        
+        _dashRechargeableDurationIsRunning = false;
+        _slowDashState = true;
     }
 
     /* Changes 2D input into 3D world direction relative to camera*/
@@ -356,7 +363,12 @@ public class PlayerController : MonoBehaviour
     
     // Reveal values so it can be used in DevTools
     public bool IsGrounded => _isGrounded;
-    public float DashCharge => _dashCharge;
+    public float DashCharge
+    {
+        get { return _dashCharge; }
+        set { _dashCharge = value; }
+    }
+    
     public float HorizontalSpeed => new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z).magnitude;
     public float TotalSpeed => rb.linearVelocity.magnitude;
 }

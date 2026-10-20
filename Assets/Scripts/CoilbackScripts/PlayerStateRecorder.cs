@@ -47,14 +47,14 @@ public class PlayerStateRecorder : MonoBehaviour
         return _playerStates[currentPlayerSequence - 1].playerPosition;
     }
 
-    public float PlayerVelocity()
+    public float PlayerVelocity(int currentPlayerSequence)
     {
-        return _playerStates[_currentPlayerSequence - 1].playerVelocity.magnitude;
+        return _playerStates[currentPlayerSequence - 1].playerVelocity.magnitude;
     }
 
-    public float DashBarAmount()
+    public float DashBarAmount(int currentPlayerSequence)
     {
-        return _playerStates[_currentPlayerSequence - 1].dashCharge;
+        return _playerStates[currentPlayerSequence - 1].dashCharge;
     }
 
     public float CurrentTimeElapsed()

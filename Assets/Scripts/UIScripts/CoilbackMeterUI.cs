@@ -16,6 +16,12 @@ public class CoilbackMeterUI : MonoBehaviour
     
     private float _usableOpacity = 1f;
     private float _unUsableOpacity = 0.3f;
+    private Color _storedColor;
+
+    void Start()
+    {
+        _storedColor = coilbackMeter.color;
+    }
     
     void Update()
     {
@@ -32,9 +38,11 @@ public class CoilbackMeterUI : MonoBehaviour
         if (fillAmount >= 0.25f)
         {
             currentColor.a = _usableOpacity;
+            currentColor = _storedColor;
         }
         else
         {
+            currentColor = Color.red;
             currentColor.a = _unUsableOpacity;
         }
         

@@ -26,18 +26,20 @@ public class CoilbackRewind : MonoBehaviour
 
     private void FixedUpdate()
     {
+        // Check if the player is rewinding and there is a previous sequence to play and the Coilback has charge
         if (_isRewinding && _newPlayerSequence > 1 && _coilbackCharge > 0)
         {
-            // Debug.Log("Current Position: " + playerStateRecorder.PlayerPosition(playerStateRecorder.CurrentPlayerSequence()));
-            //Debug.Log("Current Velocity: " + playerStateRecorder.PlayerVelocity());
-            //Debug.Log("Current Dash Bar Amount: " + playerStateRecorder.DashBarAmount());
-            //Debug.Log("Current Time: " + playerStateRecorder.CurrentTimeElapsed());
-
+            // Set player to isKinematic so physics doesn't apply during rewind
             playerRb.isKinematic = true;
+            
+            // Rewinding player position
             playerRb.MovePosition(playerStateRecorder.PlayerPosition(_newPlayerSequence));
-
             playerStateRecorder.PlayerPosition(_newPlayerSequence--);
             
+            // Rewinding dash charge
+            playerController.DashCharge =  playerStateRecorder.DashBarAmount(_newPlayerSequence);
+
+            // Reduce Coilback charge by decreaseAmount per FixedUpdate
             _coilbackCharge -= coilback.CoilbackDecreaseAmount;
         }
         else
@@ -83,9 +85,10 @@ public class CoilbackRewind : MonoBehaviour
         _isRewinding = false;
         playerRb.isKinematic = false;
         // launching player code
-        // restore player state code
+        
     }
 
+    // Public setters for PlayerController to read
     public bool IsRewinding => _isRewinding;
     
     public float CoilBackCharge => _coilbackCharge;

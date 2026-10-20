@@ -118,6 +118,10 @@ public class MovementSettings : ScriptableObject
     [SerializeField] private float dashDuration = .2f;
     public float DashDuration => dashDuration;
     
+    [Min(0), Tooltip("Seconds the player can stay in the air before the dash recharges by dashRechargeTimeSlow. (s)")]
+    [SerializeField] private float durationUntilSlowRecharge = 5f;
+    public float DurationUntilSlowRecharge => durationUntilSlowRecharge;
+    
     [Tooltip("Dashing stops any downward velocity.")]
     [SerializeField] private bool dashCancelsFall;
     public bool DashCancelsFall => dashCancelsFall;
