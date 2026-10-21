@@ -36,7 +36,7 @@ public class CoilbackMeterUI : MonoBehaviour
         Color currentColor = coilbackMeter.color;
         
         // Opacity of the Coilback bar being lower if under 25% (unusable under 25%)
-        if (fillAmount >= 0.25f || coilbackRewind.IsRewinding)
+        if (!coilbackRewind.RewindOnCooldown && (fillAmount >= 0.25f || coilbackRewind.IsRewinding))
         {
             currentColor = _storedColor;
             currentColor.a = _usableOpacity;
@@ -48,6 +48,6 @@ public class CoilbackMeterUI : MonoBehaviour
         }
         
         coilbackMeter.fillAmount = fillAmount;
-        coilbackMeter.color = currentColor;
+        coilbackMeter.DOColor(currentColor, .5f);
     }
 }

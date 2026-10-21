@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using DG.Tweening;
 
 public class DashMeterUI : MonoBehaviour
 {
@@ -39,7 +40,7 @@ public class DashMeterUI : MonoBehaviour
                 currentColor.a = _rechargingOpacity;
             }
             dashCharges[i].fillAmount = fillAmount;
-            dashCharges[i].color = currentColor;
+            dashCharges[i].DOColor(currentColor, .5f);
         }
     }
 }

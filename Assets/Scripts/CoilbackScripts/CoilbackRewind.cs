@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -11,6 +10,7 @@ public class CoilbackRewind : MonoBehaviour
     private bool _rewindOnCooldown;
     private int _newPlayerSequence;
     private float _coilbackCharge;
+    private int _rewindedSequenceCount;
     
     [Header("Player References")]
     [SerializeField] private PlayerController playerController;
@@ -54,16 +54,33 @@ public class CoilbackRewind : MonoBehaviour
         {
             // Set player to isKinematic so physics doesn't apply during rewind
             playerRb.isKinematic = true;
-            
+
             // Rewinding player position
             playerRb.MovePosition(playerStateRecorder.PlayerPosition(_newPlayerSequence));
-            playerStateRecorder.PlayerPosition(_newPlayerSequence--);
+            
+            // If there are enough sequences that has happened so far sequence count divided by 10 
+            if (_newPlayerSequence > _rewindedSequenceCount/10)
+                playerStateRecorder.PlayerPosition(_newPlayerSequence -= _rewindedSequenceCount/10);
+            // 
+            else
+            {
+                playerStateRecorder.PlayerPosition(_newPlayerSequence -= (_newPlayerSequence - 1));
+                CoilbackStopped();
+            }
+            
+            // Increment how many sequences the player has rewound in one instance
+            _rewindedSequenceCount++;
             
             // Rewinding dash charge
             playerController.DashCharge =  playerStateRecorder.DashBarAmount(_newPlayerSequence);
 
             // Reduce Coilback charge by decreaseAmount per FixedUpdate
             _coilbackCharge -= coilback.CoilbackDecreaseAmount;
+        }
+        // Coilback is stopped automatically if there is no charge
+        else if (_coilbackCharge < 0)
+        {
+            CoilbackStopped();
         }
         else
         {
@@ -100,15 +117,13 @@ public class CoilbackRewind : MonoBehaviour
     {
         _isRewinding = false;
         playerRb.isKinematic = false;
+        _rewindedSequenceCount = 0;
         
         // Fades out the rewinding overlay if the Coilback is stopped for any reason (temporary)
         rewindOverlay.DOFade(0, 1.0f);
 
         StartCoroutine(CoilbackCooldown());
-        Debug.Log("Rewind On Cooldown");
-
-        // TODO launching player code
-
+        
     }
     
     // Coroutine for Coilback Cooldown
@@ -121,6 +136,8 @@ public class CoilbackRewind : MonoBehaviour
 
     // Public setters for PlayerController to read
     public bool IsRewinding => _isRewinding;
+    
+    public bool RewindOnCooldown => _rewindOnCooldown;
     
     public float CoilBackCharge => _coilbackCharge;
 }
