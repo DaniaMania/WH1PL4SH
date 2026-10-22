@@ -59,8 +59,8 @@ public class CoilbackRewind : MonoBehaviour
             playerRb.MovePosition(playerStateRecorder.PlayerPosition(_newPlayerSequence));
             
             // If there are enough sequences that has happened so far sequence count divided by 10 
-            if (_newPlayerSequence > _rewindedSequenceCount/10)
-                playerStateRecorder.PlayerPosition(_newPlayerSequence -= _rewindedSequenceCount/10);
+            if (_newPlayerSequence > _rewindedSequenceCount/coilback.CoilbackSpeedScale)
+                playerStateRecorder.PlayerPosition(_newPlayerSequence -= _rewindedSequenceCount/(int)coilback.CoilbackSpeedScale);
             // 
             else
             {
@@ -81,12 +81,12 @@ public class CoilbackRewind : MonoBehaviour
         else if (_coilbackCharge < 0)
         {
             CoilbackStopped();
+
+            ChargeCoilback();
         }
         else
         {
-            // Coilback charges on FixedUpdate while not using it
-            if (_coilbackCharge < coilback.CoilBackMaxCharge)
-                _coilbackCharge += Time.fixedDeltaTime / (coilback.CoilbackRechargeTime / 100);
+            ChargeCoilback();
         }
     }
 
@@ -132,6 +132,13 @@ public class CoilbackRewind : MonoBehaviour
         _rewindOnCooldown = true;
         yield return new WaitForSeconds(coilback.CoilbackCooldownDuration);
         _rewindOnCooldown = false;
+    }
+
+    // Coilback charges on FixedUpdate while not using it
+    private void ChargeCoilback()
+    {
+        if (_coilbackCharge < coilback.CoilBackMaxCharge)
+            _coilbackCharge += Time.fixedDeltaTime / (coilback.CoilbackRechargeTime / 100);
     }
 
     // Public setters for PlayerController to read

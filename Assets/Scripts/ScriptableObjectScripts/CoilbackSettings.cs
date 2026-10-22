@@ -19,4 +19,8 @@ public class CoilbackSettings : ScriptableObject
     [Min(0), Tooltip("How long the cooldown for the Coilback is. (s)")]
     [SerializeField] private float coilbackCooldownDuration = 3f;
     public float CoilbackCooldownDuration => coilbackCooldownDuration;
+    
+    [Range(1, 20), Tooltip("Speed scale for the Coilback. (Lower = higher multiplier. Default 10)")]
+    [SerializeField] private int coilbackSpeedScale = 10;
+    public float CoilbackSpeedScale => coilbackSpeedScale;
 }
