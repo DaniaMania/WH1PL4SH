@@ -44,7 +44,7 @@ public class PlayerController : MonoBehaviour
     {
         _moveInput = moveAction.action.ReadValue<Vector2>();
         
-        if (jumpAction.action.WasPressedThisFrame() && !coilback.IsRewinding)
+        if (jumpAction.action.IsPressed() && !coilback.IsRewinding)
         {
             _bufferTimer = movement.JumpBufferTime;
         }
@@ -208,6 +208,9 @@ public class PlayerController : MonoBehaviour
         Vector3 right = playerCamera.transform.right;
         right.y = 0;
         right.Normalize();
+        
+        if (_isGrounded == false && _moveInput.y == 0)
+            return ((forward) + (right * moveInput.x)).normalized;
         
         // Unit length so diagonals are not faster (only input)
         return ((forward * moveInput.y) + (right * moveInput.x)).normalized;

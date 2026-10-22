@@ -16,4 +16,4 @@ MonoBehaviour:
   coilBackMaxCharge: 100
   coilbackDecreaseAmount: 1
   coilbackCooldownDuration: 3
-  coilbackSpeedScale: 10
+  coilbackSpeedScale: 20
