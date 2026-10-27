@@ -11,6 +11,8 @@ public class CoilbackRewind : MonoBehaviour
     private int _newPlayerSequence;
     private float _coilbackCharge;
     private int _rewindedSequenceCount;
+    private float _rewindStartTime;
+    private float _rewindCoolDownTime;
     
     [Header("Player References")]
     [SerializeField] private PlayerController playerController;
@@ -45,6 +47,11 @@ public class CoilbackRewind : MonoBehaviour
     private void OnDisable()
     {
         rewindAction.action.Disable();
+    }
+
+    private void Update()
+    {
+        _rewindCoolDownTime = 3 - (Time.time - _rewindStartTime);
     }
 
     private void FixedUpdate()
@@ -123,13 +130,14 @@ public class CoilbackRewind : MonoBehaviour
         rewindOverlay.DOFade(0, 1.0f);
 
         StartCoroutine(CoilbackCooldown());
-        
     }
     
     // Coroutine for Coilback Cooldown
     private IEnumerator CoilbackCooldown()
     {
         _rewindOnCooldown = true;
+        _rewindCoolDownTime = 3;
+        _rewindStartTime = Time.time;
         yield return new WaitForSeconds(coilback.CoilbackCooldownDuration);
         _rewindOnCooldown = false;
     }
@@ -143,8 +151,7 @@ public class CoilbackRewind : MonoBehaviour
 
     // Public setters for PlayerController to read
     public bool IsRewinding => _isRewinding;
-    
     public bool RewindOnCooldown => _rewindOnCooldown;
-    
+    public float RewindCoolDownTime => _rewindCoolDownTime;
     public float CoilBackCharge => _coilbackCharge;
 }
