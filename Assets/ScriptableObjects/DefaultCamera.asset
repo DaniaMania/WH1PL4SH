@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: DefaultCamera
   m_EditorClassIdentifier: Assembly-CSharp::CameraSettings
   baseFOV: 60
-  maxFOV: 85
+  maxFOV: 75
   fovStartSpeed: 10
   fovEndSpeed: 50
   fovSmoothRate: 12
