@@ -6,7 +6,7 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/ScriptScenes/DemoLevel.unity
+    path: Assets/Scenes/ScriptScenes/ScriptingScene.unity
     guid: 85142c71bb676e840ba947987a7873d4
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
