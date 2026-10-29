@@ -13,31 +13,32 @@ public class CoilbackRewind : MonoBehaviour
     private int _rewindedSequenceCount;
     private float _rewindStartTime;
     private float _rewindCoolDownTime;
-    
-    [Header("Player References")]
-    [SerializeField] private PlayerController playerController;
+
+    [Header("Player References")] [SerializeField]
+    private PlayerController playerController;
+
     [SerializeField] private Rigidbody playerRb;
     [SerializeField] private PlayerStateRecorder playerStateRecorder;
-    
-    [Header("UI References")]
-    [SerializeField] private Image rewindOverlay;
-    
-    [Header("Rewind Input")]
-    [SerializeField] private InputActionReference rewindAction;
-    
-    [Header("Coilback Settings")]
-    [SerializeField] private CoilbackSettings coilback;
+
+    [Header("UI References")] [SerializeField]
+    private Image rewindOverlay;
+
+    [Header("Rewind Input")] [SerializeField]
+    private InputActionReference rewindAction;
+
+    [Header("Coilback Settings")] [SerializeField]
+    private CoilbackSettings coilback;
 
     private void Awake()
     {
         // Set Coilback charge to max on awake
         _coilbackCharge = coilback.CoilBackMaxCharge;
-        
+
         // Checking the rewind action key if it is pressed or released
         rewindAction.action.performed += OnRewind;
         rewindAction.action.canceled += OnRewind;
     }
-    
+
     // OnEnable/Disable so that Unity doesn't check for keyboard inputs when Coilback isn't relevant
     private void OnEnable()
     {
@@ -64,22 +65,23 @@ public class CoilbackRewind : MonoBehaviour
 
             // Rewinding player position
             playerRb.MovePosition(playerStateRecorder.PlayerPosition(_newPlayerSequence));
-            
+
             // If there are enough sequences that has happened so far sequence count divided by 10 
-            if (_newPlayerSequence > _rewindedSequenceCount/coilback.CoilbackSpeedScale)
-                playerStateRecorder.PlayerPosition(_newPlayerSequence -= _rewindedSequenceCount/(int)coilback.CoilbackSpeedScale);
+            if (_newPlayerSequence > _rewindedSequenceCount / coilback.CoilbackSpeedScale)
+                playerStateRecorder.PlayerPosition(_newPlayerSequence -=
+                    _rewindedSequenceCount / (int)coilback.CoilbackSpeedScale);
             // 
             else
             {
                 playerStateRecorder.PlayerPosition(_newPlayerSequence -= (_newPlayerSequence - 1));
                 CoilbackStopped();
             }
-            
+
             // Increment how many sequences the player has rewound in one instance
             _rewindedSequenceCount++;
-            
+
             // Rewinding dash charge
-            playerController.DashCharge =  playerStateRecorder.DashBarAmount(_newPlayerSequence);
+            playerController.DashCharge = playerStateRecorder.DashBarAmount(_newPlayerSequence);
 
             // Reduce Coilback charge by decreaseAmount per FixedUpdate
             _coilbackCharge -= coilback.CoilbackDecreaseAmount;
@@ -107,7 +109,7 @@ public class CoilbackRewind : MonoBehaviour
             {
                 _newPlayerSequence = playerStateRecorder.CurrentPlayerSequence();
                 _isRewinding = true;
-            
+
                 // Fades in the rewinding overlay (temporary)
                 rewindOverlay.DOFade(0.1f, 1.0f);
             }
@@ -125,13 +127,13 @@ public class CoilbackRewind : MonoBehaviour
         _isRewinding = false;
         playerRb.isKinematic = false;
         _rewindedSequenceCount = 0;
-        
+
         // Fades out the rewinding overlay if the Coilback is stopped for any reason (temporary)
         rewindOverlay.DOFade(0, 1.0f);
 
         StartCoroutine(CoilbackCooldown());
     }
-    
+
     // Coroutine for Coilback Cooldown
     private IEnumerator CoilbackCooldown()
     {
@@ -151,7 +153,16 @@ public class CoilbackRewind : MonoBehaviour
 
     // Public setters for PlayerController to read
     public bool IsRewinding => _isRewinding;
-    public bool RewindOnCooldown => _rewindOnCooldown;
     public float RewindCoolDownTime => _rewindCoolDownTime;
-    public float CoilBackCharge => _coilbackCharge;
+
+    public bool RewindOnCooldown
+    {
+        get { return _rewindOnCooldown; }
+        set { _rewindOnCooldown = value; }
+    }
+    public float CoilBackCharge
+    {
+        get { return _coilbackCharge; }
+        set { _coilbackCharge = value; }
+    }
 }

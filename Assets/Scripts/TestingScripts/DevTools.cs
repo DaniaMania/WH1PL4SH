@@ -14,6 +14,7 @@ public class DevTools : MonoBehaviour
     [SerializeField] private Rigidbody playerRb;
     [SerializeField] private PlayerController playerController;
     [SerializeField] private Transform playerSpawn;
+    [SerializeField] private CoilbackRewind coilbackRewind;
 
     [Header("FPS")]
     [SerializeField, Min(0.05f)] private float fpsRefreshInterval = 0.25f;
@@ -116,6 +117,10 @@ public class DevTools : MonoBehaviour
         playerRb.position = pos;
         playerRb.rotation = rot;
         playerRb.transform.SetPositionAndRotation(pos, rot);
+
+        coilbackRewind.CoilBackCharge = 100;
+        coilbackRewind.RewindOnCooldown = false;
+        playerController.DashCharge = 3;
 
         SpeedrunTrigger.ResetTimer();
     }
