@@ -12,14 +12,6 @@ public class PlayerController : MonoBehaviour
     private Vector3 _groundNormal;
     private float _lastLeaveGroundTime;
     private float _bufferTimer;
-
-    private bool _dashQueued;
-    private float _dashCharge;
-    private bool _dashRechargeableDurationIsRunning;
-    private bool _slowDashState;
-    private float _dashEndTime;
-    
-    public event Action<Vector3> Dashed;
     
     [Header("Player References")]
     [SerializeField] private CinemachineCamera playerCamera;
@@ -37,8 +29,6 @@ public class PlayerController : MonoBehaviour
     {
         // lock cursor to the middle of the screen (lock mode = locked caused cursor to not be visible as well)
         Cursor.lockState = CursorLockMode.Locked;
-
-        _dashCharge = movement.MaxDashCharges;
     }
     void Update()
     {
@@ -48,11 +38,6 @@ public class PlayerController : MonoBehaviour
         {
             _bufferTimer = movement.JumpBufferTime;
         }
-
-        if (dashAction.action.WasPressedThisFrame() && !coilback.IsRewinding)
-        {
-            _dashQueued = true;
-        }
     }
 
     void FixedUpdate()
@@ -60,38 +45,6 @@ public class PlayerController : MonoBehaviour
         // If Coilback is rewinding, nothing here can happen
         if (!coilback.IsRewinding)
         {
-            // If the player is grounded dash recharges over time at the default rate (DashRechargeTime)
-            if (_isGrounded)
-            {
-                // If dash rechargeable duration is running and the player grounds, the coroutine stops
-                if (_dashRechargeableDurationIsRunning)
-                {
-                    StopCoroutine("DashRechargeableDuration");
-                    
-                    _dashRechargeableDurationIsRunning = false;
-                    _slowDashState = false;
-                }
-                
-                // Dash recharging over time (normal speed of DashRechargeTime)
-                _dashCharge = Mathf.Min(_dashCharge + Time.fixedDeltaTime/movement.DashRechargeTime, movement.MaxDashCharges);
-            }
-            else
-            {
-                // If the player isn't grounded and dash rechargeable duration is not running, start the coroutine
-                if (!_dashRechargeableDurationIsRunning)
-                {
-                    StartCoroutine("DashRechargeableDuration");
-                }
-                
-                // If the player is in slowDashState (set by the coroutine) the dash recharges at DashRechargeTimeSlow
-                else if (!_slowDashState)
-                    _dashCharge = Mathf.Min(_dashCharge + Time.fixedDeltaTime/movement.DashRechargeTime, movement.MaxDashCharges);
-                
-                // While the coroutine is running and the player isn't in slow mode yet, recharge at the normal speed
-                else
-                    _dashCharge = Mathf.Min(_dashCharge + Time.fixedDeltaTime/movement.DashRechargeTimeSlow, movement.MaxDashCharges);
-            }
-        
             Vector3 wishDirection = GetWishDirection(_moveInput);
         
             Vector3 velocity = rb.linearVelocity;
@@ -101,41 +54,25 @@ public class PlayerController : MonoBehaviour
 
             // Jumping application
             bool jumped = TryJump();
-            
-            if (jumped)
-                _dashEndTime = Time.time;
-            
-            // Dashing application
-            bool dashed = TryConsumeDash();
-            
-            if (dashed)
-                _dashEndTime = Time.time + movement.DashDuration;
 
-            bool dashing = Time.time < _dashEndTime;
-
-            bool skipHorizontal = dashed || (dashing && movement.DashLocksMovement);
-
-            if (!skipHorizontal)
+            if (_isGrounded && !jumped)
             {
-                if (_isGrounded && !jumped)
-                {
-                    horizontalVelocity = ApplyFriction(horizontalVelocity);
-                    horizontalVelocity = Accelerate(horizontalVelocity, wishDirection, movement.GroundWishSpeed, movement.GroundWishSpeed, movement.GroundAcceleration);
-                }
-                else
-                {
-                    float oldSpeed = horizontalVelocity.magnitude;
-                    Vector3 newVelocity = Accelerate(horizontalVelocity, wishDirection, Mathf.Min(movement.AirWishSpeedCap, movement.GroundWishSpeed), movement.GroundWishSpeed, movement.AirAcceleration);
-                    float newSpeed = newVelocity.magnitude;
+                horizontalVelocity = ApplyFriction(horizontalVelocity);
+                horizontalVelocity = Accelerate(horizontalVelocity, wishDirection, movement.GroundWishSpeed, movement.GroundWishSpeed, movement.GroundAcceleration);
+            }
+            else
+            {
+                float oldSpeed = horizontalVelocity.magnitude;
+                Vector3 newVelocity = Accelerate(horizontalVelocity, wishDirection, Mathf.Min(movement.AirWishSpeedCap, movement.GroundWishSpeed), movement.GroundWishSpeed, movement.AirAcceleration);
+                float newSpeed = newVelocity.magnitude;
 
-                    if (newSpeed > oldSpeed)
-                    {
-                        float keptSpeed = oldSpeed + movement.AirSpeedGainScale * (newSpeed - oldSpeed);
-                        newVelocity *= (keptSpeed / newSpeed);
-                    }
-                
-                    horizontalVelocity = newVelocity;
+                if (newSpeed > oldSpeed)
+                {
+                    float keptSpeed = oldSpeed + movement.AirSpeedGainScale * (newSpeed - oldSpeed);
+                    newVelocity *= (keptSpeed / newSpeed);
                 }
+                
+                horizontalVelocity = newVelocity;
             }
 
             if (jumped)
@@ -146,55 +83,11 @@ public class PlayerController : MonoBehaviour
             }
             else if (_isGrounded)
                 velocity.y = -(horizontalVelocity.x * _groundNormal.x + horizontalVelocity.z * _groundNormal.z) / _groundNormal.y;
-            else if (!dashing)
+            else
                 velocity.y -= movement.Gravity * Time.fixedDeltaTime;
-            
-            if (dashed)
-            {
-                Vector3 full = new Vector3(horizontalVelocity.x, velocity.y, horizontalVelocity.z);
-                
-                if (movement.DashCancelsFall && full.y < 0)
-                    full.y = 0;
-
-                Vector3 dashDirection = GetDashDirection(_moveInput);
-                
-                Dashed?.Invoke(dashDirection);
-                
-                full = ApplyDash(full, dashDirection);
-                
-                horizontalVelocity = new Vector3(full.x, 0, full.z);
-                velocity.y = full.y;
-                
-                if (velocity.y > 0)
-                {
-                    _lastLeaveGroundTime = Time.time;
-                }
-            }   
             
             rb.linearVelocity = new Vector3(horizontalVelocity.x, velocity.y, horizontalVelocity.z);
         }
-    }
-    
-    private Vector3 ApplyDash(Vector3 full, Vector3 direction)
-    {
-        if (movement.DashRedirect)
-        {
-            float fullHorizontalSpeed = new Vector3(full.x, 0, full.z).magnitude;
-
-            return (direction * (fullHorizontalSpeed + movement.DashSpeed));
-        }
-
-        return (full + direction * movement.DashSpeed);
-    }
-    
-    // Coroutine for checking how long the player can be not grounded while recharging dash at the default rate (DashRechargeTime)
-    private IEnumerator DashRechargeableDuration()
-    {
-        _dashRechargeableDurationIsRunning = true;
-        yield return new WaitForSeconds(movement.DurationUntilSlowRecharge);
-        
-        _dashRechargeableDurationIsRunning = false;
-        _slowDashState = true;
     }
 
     /* Changes 2D input into 3D world direction relative to camera*/
@@ -214,45 +107,6 @@ public class PlayerController : MonoBehaviour
         
         // Unit length so diagonals are not faster (only input)
         return ((forward * moveInput.y) + (right * moveInput.x)).normalized;
-    }
-
-    private Vector3 GetDashDirection(Vector2 moveInput)
-    {
-        // Make 2 different forward, one flat and one not
-        Vector3 forward = playerCamera.transform.forward;
-        
-        Vector3 forwardFlat = forward;
-        forwardFlat.y = 0;
-        forwardFlat.Normalize();
-        
-        Vector3 right = playerCamera.transform.right;
-        Vector3 dashForward = forward;
-
-        // Switch case for different movement modes
-        switch (movement.DashDirectionMode)
-        {
-            
-            case DashDirectionMode.FlatKeys:
-                if (moveInput == Vector2.zero)
-                    return forwardFlat;
-                else
-                    return GetWishDirection(moveInput);
-                
-            case DashDirectionMode.CameraLook:
-                return forward;
-                
-            case DashDirectionMode.CameraRelativeKeys:
-                
-                if (moveInput == Vector2.zero)
-                    return forward;
-                else if (moveInput.y < 0 && movement.FlattenBackDash)
-                    dashForward = forwardFlat;
-                
-                return (dashForward * moveInput.y + right * moveInput.x).normalized;
-                
-            default:
-                return forward;
-        }
     }
 
     private Vector3 ApplyFriction(Vector3 horizontalVelocity)
@@ -295,18 +149,6 @@ public class PlayerController : MonoBehaviour
             }
             _bufferTimer -= Time.fixedDeltaTime;
             return false;
-    }
-
-    private bool TryConsumeDash()
-    {
-        if (_dashQueued && _dashCharge >= 1)
-        {
-            _dashQueued = false;
-            _dashCharge -= 1;
-            return true;
-        }
-        _dashQueued = false;
-        return false;
     }
 
     private void CheckGround()
@@ -364,11 +206,6 @@ public class PlayerController : MonoBehaviour
     
     // Reveal values so it can be used in DevTools
     public bool IsGrounded => _isGrounded;
-    public float DashCharge
-    {
-        get { return _dashCharge; }
-        set { _dashCharge = value; }
-    }
     
     public float HorizontalSpeed => new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z).magnitude;
     public float TotalSpeed => rb.linearVelocity.magnitude;

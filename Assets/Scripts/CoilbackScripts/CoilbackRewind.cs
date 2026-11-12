@@ -77,9 +77,6 @@ public class CoilbackRewind : MonoBehaviour
             
             // Increment how many sequences the player has rewound in one instance
             _rewindedSequenceCount++;
-            
-            // Rewinding dash charge
-            playerController.DashCharge =  playerStateRecorder.DashBarAmount(_newPlayerSequence);
 
             // Reduce Coilback charge by decreaseAmount per FixedUpdate
             _coilbackCharge -= coilback.CoilbackDecreaseAmount;

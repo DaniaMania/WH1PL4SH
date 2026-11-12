@@ -6,8 +6,7 @@ public class PlayerStateRecorder : MonoBehaviour
 {
     private Vector3 _playerPosition;
     private Vector3 _playerVelocity;
-    private float _dashCharge;
-    private List<(Vector3 playerPosition, Vector3 playerVelocity, float dashCharge, float time)> _playerStates = new List<(Vector3 playerPosition, Vector3 playerVelocity, float dashCharge, float time)>();
+    private List<(Vector3 playerPosition, Vector3 playerVelocity,  float time)> _playerStates = new List<(Vector3 playerPosition, Vector3 playerVelocity, float time)>();
     private int _currentPlayerSequence;
     
     [Header("Player References")]
@@ -19,16 +18,15 @@ public class PlayerStateRecorder : MonoBehaviour
         RecordPosition();
     }
 
-    /* Records player position, velocity, dash charge amount, and current time in a tuple in a list */
+    /* Records player position, velocity, charge amount, and current time in a tuple in a list */
     private void RecordPosition()
     {
-        // Find player position, velocity, and dash charge amount
+        // Find player position, velocity, and  charge amount
         _playerPosition = playerController.transform.position;
         _playerVelocity = playerRb.linearVelocity;
-        _dashCharge = playerController.DashCharge;
         
         // Add the relevant player state elements as a tuple to the list
-        _playerStates.Add((_playerPosition, _playerVelocity, _dashCharge, Time.fixedTime));
+        _playerStates.Add((_playerPosition, _playerVelocity, Time.fixedTime));
         
         // Debug that prints out all of the tuple values
         //Debug.Log(" Position: " +  _playerStates[_currentPlayerSequence].playerPosition + " Time: " + _playerStates[_currentPlayerSequence].time + " Velocity: " + _playerStates[_currentPlayerSequence].playerVelocity.magnitude + " Time: " + _playerStates[_currentPlayerSequence].time);
@@ -50,11 +48,6 @@ public class PlayerStateRecorder : MonoBehaviour
     public float PlayerVelocity(int currentPlayerSequence)
     {
         return _playerStates[currentPlayerSequence - 1].playerVelocity.magnitude;
-    }
-
-    public float DashBarAmount(int currentPlayerSequence)
-    {
-        return _playerStates[currentPlayerSequence - 1].dashCharge;
     }
 
     public float CurrentTimeElapsed()
