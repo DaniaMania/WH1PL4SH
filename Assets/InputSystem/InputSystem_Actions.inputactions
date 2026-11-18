@@ -95,6 +95,16 @@
                     "interactions": "",
                     "initialStateCheck": false,
                     "priority": 0
+                },
+                {
+                    "name": "Run",
+                    "type": "Button",
+                    "id": "4467b8e3-cdbd-4234-860d-9b00a5c1be2c",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false,
+                    "priority": 0
                 }
             ],
             "bindings": [
@@ -453,11 +463,22 @@
                 {
                     "name": "",
                     "id": "63a6a79c-aaab-42d1-96b1-5c25248c08e4",
-                    "path": "<Keyboard>/leftShift",
+                    "path": "<Keyboard>/e",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
                     "action": "Coilback",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "44751186-04b0-4841-aeb7-e1e3507c30dc",
+                    "path": "<Keyboard>/shift",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Run",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

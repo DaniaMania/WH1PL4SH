@@ -1,44 +1,37 @@
 using UnityEngine;
-public enum DashDirectionMode {FlatKeys, CameraLook, CameraRelativeKeys}
 
 [CreateAssetMenu(fileName = "MovementSettings", menuName = "Scriptable Objects/MovementSettings")]
 public class MovementSettings : ScriptableObject
 {
-    [Header("Ground Movement")] 
-    [Min(0), Tooltip("Speed your input aims for on the ground. Actual speed can exceed this with other movement methods. Higher = faster running on the ground.")]
-    [SerializeField] private float groundWishSpeed = 8;
-    public float GroundWishSpeed => groundWishSpeed; 
+    [Header("Walking")] 
+    [Min(0), Tooltip("Speed that the player aims for when in walking mode and grounded.")]
+    [SerializeField] private float walkGroundSpeed = 10;
+    public float WalkGroundSpeed => walkGroundSpeed; 
     
-    [Min(0), Tooltip("How quickly you reach ground wish speed. Higher = faster build up.")]
-    [SerializeField] private float groundAcceleration = 10;
-    public float GroundAcceleration => groundAcceleration;
+    [Min(0), Tooltip("Player acceleration when in walking mode and grounded.")]
+    [SerializeField] private float walkGroundAcceleration = 5;
+    public float WalkGroundAcceleration => walkGroundAcceleration;
     
-    [Min(0), Tooltip("How fast ground speed decreases. Higher = less slide.")]
-    [SerializeField] private float friction = 4;
-    public float Friction => friction;
+    [Min(0), Tooltip("Player acceleration when in walking mode and not grounded.")]
+    [SerializeField] private float walkAirAcceleration = 2;
+    public float WalkAirAcceleration => walkAirAcceleration;
     
-    [Min(0), Tooltip("Below this speed, friction acts as if you were moving this fast, so you stop cleanly instead of creeping.")]
-    [SerializeField] private float stopSpeed = 2.5f;
-    public float StopSpeed => stopSpeed;
-    
-    [Min(0), Tooltip("Amount of time that the player doesn't experience friction for after landing on the ground.")]
-    [SerializeField] private float landingGraceTime = 0.1f;
-    public float LandingGraceTime => landingGraceTime;
+    [Min(0), Tooltip("Player friction when in walking mode.")]
+    [SerializeField] private float walkFriction = 7;
+    public float WalkFriction => walkFriction;
     
     
+    [Header("Running")] 
     
-    [Header("Air Movement")] 
-    [Range(0,10), Tooltip("Changes how forgiving the strafe angle is. Doesn't limit air speed.")]
-    [SerializeField] private float airWishSpeedCap = 0.75f;
-    public float AirWishSpeedCap => airWishSpeedCap;
+    
+    
+    [Header("Air Movement")]
+    
+    // TODO air drag
     
     [Range(0, 10), Tooltip("Limits air braking and reversing.")]
     [SerializeField] private float airAcceleration = 4;
     public float AirAcceleration => airAcceleration;
-    
-    [Range(0, 1), Tooltip("How much speed from air strafing is kept. (1 = max, 0 = none)")]
-    [SerializeField] private float airSpeedGainScale = 1;
-    public float AirSpeedGainScale => airSpeedGainScale;
     
     
     

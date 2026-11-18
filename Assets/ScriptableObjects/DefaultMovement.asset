@@ -12,14 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 38d0be52444d74938825293fa23399de, type: 3}
   m_Name: DefaultMovement
   m_EditorClassIdentifier: Assembly-CSharp::MovementSettings
-  groundWishSpeed: 10
-  groundAcceleration: 10
-  friction: 1
+  groundWishSpeed: 15
+  groundAcceleration: 2
+  friction: 5
   stopSpeed: 2.5
-  landingGraceTime: 2.5
-  airWishSpeedCap: 5
   airAcceleration: 10
-  airSpeedGainScale: 1
   jumpHeight: 1.2
   jumpBufferTime: 0.2
   gravity: 20
@@ -31,14 +28,3 @@ MonoBehaviour:
   groundLayers:
     serializedVersion: 2
     m_Bits: 55
-  maxDashCharges: 3
-  dashRechargeTime: 3
-  dashRechargeTimeSlow: 7
-  dashSpeed: 5
-  dashRedirect: 1
-  dashDirectionMode: 2
-  flattenBackDash: 0
-  dashDuration: 0.2
-  durationUntilSlowRecharge: 5
-  dashCancelsFall: 1
-  dashLocksMovement: 1

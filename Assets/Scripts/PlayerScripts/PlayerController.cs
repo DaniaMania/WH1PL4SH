@@ -33,11 +33,6 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         _moveInput = moveAction.action.ReadValue<Vector2>();
-        
-        if (jumpAction.action.IsPressed() && !coilback.IsRewinding)
-        {
-            _bufferTimer = movement.JumpBufferTime;
-        }
     }
 
     void FixedUpdate()
@@ -45,50 +40,33 @@ public class PlayerController : MonoBehaviour
         // If Coilback is rewinding, nothing here can happen
         if (!coilback.IsRewinding)
         {
+            CheckGround();
+            
             Vector3 wishDirection = GetWishDirection(_moveInput);
-        
             Vector3 velocity = rb.linearVelocity;
             Vector3 horizontalVelocity = new Vector3(velocity.x, 0, velocity.z);
-        
-            CheckGround();
 
-            // Jumping application
-            bool jumped = TryJump();
+            Vector3 targetVelocity = wishDirection * movement.WalkGroundSpeed;
 
-            if (_isGrounded && !jumped)
-            {
-                horizontalVelocity = ApplyFriction(horizontalVelocity);
-                horizontalVelocity = Accelerate(horizontalVelocity, wishDirection, movement.GroundWishSpeed, movement.GroundWishSpeed, movement.GroundAcceleration);
-            }
-            else
-            {
-                float oldSpeed = horizontalVelocity.magnitude;
-                Vector3 newVelocity = Accelerate(horizontalVelocity, wishDirection, Mathf.Min(movement.AirWishSpeedCap, movement.GroundWishSpeed), movement.GroundWishSpeed, movement.AirAcceleration);
-                float newSpeed = newVelocity.magnitude;
-
-                if (newSpeed > oldSpeed)
-                {
-                    float keptSpeed = oldSpeed + movement.AirSpeedGainScale * (newSpeed - oldSpeed);
-                    newVelocity *= (keptSpeed / newSpeed);
-                }
-                
-                horizontalVelocity = newVelocity;
-            }
-
-            if (jumped)
-            {
-                _lastLeaveGroundTime = Time.time;
-                float jumpVelocity = Mathf.Sqrt(2 * movement.Gravity * movement.JumpHeight);
-                velocity.y = jumpVelocity;
-            }
-            else if (_isGrounded)
-                velocity.y = -(horizontalVelocity.x * _groundNormal.x + horizontalVelocity.z * _groundNormal.z) / _groundNormal.y;
-            else
-                velocity.y -= movement.Gravity * Time.fixedDeltaTime;
+            Vector3 nextHorizontal;
             
-            rb.linearVelocity = new Vector3(horizontalVelocity.x, velocity.y, horizontalVelocity.z);
+            if (_isGrounded)
+            {
+                if (wishDirection == new Vector3(0,0,0))
+                    nextHorizontal= Vector3.MoveTowards(horizontalVelocity, targetVelocity, movement.WalkFriction * Time.fixedDeltaTime);
+                else
+                    nextHorizontal= Vector3.MoveTowards(horizontalVelocity, targetVelocity, movement.WalkGroundAcceleration * Time.fixedDeltaTime);
+            }
+            else
+            {
+                nextHorizontal= Vector3.MoveTowards(horizontalVelocity, targetVelocity, movement.WalkAirAcceleration * Time.fixedDeltaTime);
+            }
+            //horizontalVelocity = new Vector3(wishDirection.x * 10, 0, wishDirection.z * 10);
+            
+            rb.linearVelocity = new Vector3(nextHorizontal.x, velocity.y, nextHorizontal.z);
         }
     }
+    
 
     /* Changes 2D input into 3D world direction relative to camera*/
     private Vector3 GetWishDirection(Vector2 moveInput)
@@ -102,41 +80,8 @@ public class PlayerController : MonoBehaviour
         right.y = 0;
         right.Normalize();
         
-        if (_isGrounded == false && _moveInput.y == 0)
-            return ((forward) + (right * moveInput.x)).normalized;
-        
         // Unit length so diagonals are not faster (only input)
         return ((forward * moveInput.y) + (right * moveInput.x)).normalized;
-    }
-
-    private Vector3 ApplyFriction(Vector3 horizontalVelocity)
-    {
-        float speed = horizontalVelocity.magnitude;
-        
-        if (speed <= 0.01f)
-            return Vector3.zero;
-        
-        // Below stop speed, friction acts as if moving at stop speed (faster stop)
-        float control = Mathf.Max(speed, movement.StopSpeed);
-        float drop = control * movement.Friction * Time.fixedDeltaTime;
-        float newSpeed = Mathf.Max(speed - drop, 0);
-        
-        return horizontalVelocity * (newSpeed / speed);
-    }
-
-    /* Pushes velocity toward wishDirection until velocity along wishDirection reaches capSpeed (however, general speed is uncapped)*/
-    private Vector3 Accelerate(Vector3 horizontalVelocity, Vector3 wishDirection, float capSpeed, float pushSpeed, float acceleration)
-    {
-        float currentSpeed = Vector3.Dot(horizontalVelocity, wishDirection);
-        float addSpeed = capSpeed - currentSpeed;
-
-        // No acceleration if it is already at capSpeed
-        if (addSpeed <= 0)
-            return horizontalVelocity;
-        
-        float accelerationSpeed = Mathf.Min(acceleration * pushSpeed * Time.fixedDeltaTime, addSpeed);
-        
-        return horizontalVelocity + wishDirection * accelerationSpeed;
     }
 
     private bool TryJump()
