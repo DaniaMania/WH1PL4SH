@@ -3,6 +3,7 @@ using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections;
+using Unity.VectorGraphics;
 
 public class PlayerController : MonoBehaviour
 {
@@ -33,6 +34,11 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         _moveInput = moveAction.action.ReadValue<Vector2>();
+        
+        if (jumpAction.action.IsPressed() && !coilback.IsRewinding)
+        {
+            _bufferTimer = movement.JumpBufferTime;
+        }
     }
 
     void FixedUpdate()
@@ -47,24 +53,51 @@ public class PlayerController : MonoBehaviour
             Vector3 horizontalVelocity = new Vector3(velocity.x, 0, velocity.z);
 
             Vector3 targetVelocity = wishDirection * movement.WalkGroundSpeed;
-
-            Vector3 nextHorizontal;
             
-            if (_isGrounded)
-            {
-                if (wishDirection == new Vector3(0,0,0))
-                    nextHorizontal= Vector3.MoveTowards(horizontalVelocity, targetVelocity, movement.WalkFriction * Time.fixedDeltaTime);
-                else
-                    nextHorizontal= Vector3.MoveTowards(horizontalVelocity, targetVelocity, movement.WalkGroundAcceleration * Time.fixedDeltaTime);
-            }
-            else
-            {
-                nextHorizontal= Vector3.MoveTowards(horizontalVelocity, targetVelocity, movement.WalkAirAcceleration * Time.fixedDeltaTime);
-            }
-            //horizontalVelocity = new Vector3(wishDirection.x * 10, 0, wishDirection.z * 10);
+            Vector3 storedHorizontalVelocity = Walk(wishDirection, horizontalVelocity, targetVelocity);
             
-            rb.linearVelocity = new Vector3(nextHorizontal.x, velocity.y, nextHorizontal.z);
+            velocity.y = Jump(velocity, horizontalVelocity);
+            
+            rb.linearVelocity = new Vector3(storedHorizontalVelocity.x, velocity.y, storedHorizontalVelocity.z);
         }
+    }
+
+    private Vector3 Walk(Vector3 wishDirection,  Vector3 horizontalVelocity, Vector3 targetVelocity)
+    {
+        Vector3 nextHorizontal;
+        
+        if (_isGrounded)
+        {
+            if (wishDirection == new Vector3(0,0,0))
+                nextHorizontal = Vector3.MoveTowards(horizontalVelocity, targetVelocity, movement.WalkFriction * Time.fixedDeltaTime);
+            else
+                nextHorizontal = Vector3.MoveTowards(horizontalVelocity, targetVelocity, movement.WalkGroundAcceleration * Time.fixedDeltaTime);
+        }
+        else
+        {
+            nextHorizontal= Vector3.MoveTowards(horizontalVelocity, targetVelocity, movement.WalkAirAcceleration * Time.fixedDeltaTime);
+        }
+        
+        return nextHorizontal;
+    }
+
+    private float Jump(Vector3 velocity, Vector3 horizontalVelocity)
+    {
+        bool jumped = TryJump();
+        
+            
+        if (jumped)
+        {
+            // jumping equation based on real-world physics (kinematic equation v^2 = u^2 + 2as)
+            float jumpVelocity = Mathf.Sqrt(2 * movement.Gravity * movement.JumpHeight);
+            velocity.y = jumpVelocity;
+        }
+        else if (_isGrounded)
+            velocity.y = -(horizontalVelocity.x * _groundNormal.x + horizontalVelocity.z * _groundNormal.z) / _groundNormal.y;
+        else
+            velocity.y -= movement.Gravity * Time.fixedDeltaTime;
+
+        return velocity.y;
     }
     
 

@@ -12,14 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 38d0be52444d74938825293fa23399de, type: 3}
   m_Name: DefaultMovement
   m_EditorClassIdentifier: Assembly-CSharp::MovementSettings
-  groundWishSpeed: 15
-  groundAcceleration: 2
-  friction: 5
-  stopSpeed: 2.5
+  walkGroundSpeed: 20
+  walkGroundAcceleration: 100
+  walkAirAcceleration: 50
+  walkFriction: 50
   airAcceleration: 10
-  jumpHeight: 1.2
+  jumpHeight: 3
   jumpBufferTime: 0.2
-  gravity: 20
+  gravity: 50
   groundCheckRadiusScale: 0.95
   groundCheckDistance: 0.14
   groundCheckStartOffset: 0
