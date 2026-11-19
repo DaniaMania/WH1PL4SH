@@ -4,7 +4,7 @@ using UnityEngine;
 public class MovementSettings : ScriptableObject
 {
     [Header("Walking")] 
-    [Min(0), Tooltip("Speed that the player aims for when in walking mode and grounded.")]
+    [Min(0), Tooltip("Speed that the player aims for (max speed) when in walking mode and grounded.")]
     [SerializeField] private float walkGroundSpeed = 10;
     public float WalkGroundSpeed => walkGroundSpeed; 
     
@@ -23,15 +23,6 @@ public class MovementSettings : ScriptableObject
     
     [Header("Running")] 
     
-    
-    
-    [Header("Air Movement")]
-    
-    // TODO air drag
-    
-    [Range(0, 10), Tooltip("Limits air braking and reversing.")]
-    [SerializeField] private float airAcceleration = 4;
-    public float AirAcceleration => airAcceleration;
     
     
     

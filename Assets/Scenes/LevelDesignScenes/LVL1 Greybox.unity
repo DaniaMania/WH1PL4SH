@@ -18107,7 +18107,6 @@ MonoBehaviour:
   coilback: {fileID: 131247125}
   moveAction: {fileID: -1680190386980627800, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   jumpAction: {fileID: -2099379676528639254, guid: 052faaac586de48259a63d0c4782560b, type: 3}
-  dashAction: {fileID: 0}
 --- !u!114 &131247124
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -217017,7 +217016,7 @@ GameObject:
   - component: {fileID: 1511304360}
   - component: {fileID: 1511304359}
   m_Layer: 14
-  m_Name: TimerText
+  m_Name: PlayerStateText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -245188,6 +245187,7 @@ GameObject:
   - component: {fileID: 1684965872}
   - component: {fileID: 1684965871}
   - component: {fileID: 1684965876}
+  - component: {fileID: 1684965877}
   - component: {fileID: 1684965875}
   m_Layer: 5
   m_Name: UI
@@ -245318,6 +245318,22 @@ MonoBehaviour:
   coilbackCooldownText: {fileID: 618292466}
   coilbackRewind: {fileID: 131247125}
   coilback: {fileID: 11400000, guid: 6dc2469f23c164c18bbf2b2c6c3b49da, type: 2}
+--- !u!114 &1684965877
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1684965869}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32e8028946f0b724188d67f4a245069a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerStateUI
+  playerStateText: {fileID: 1511304359}
+  speedtext: {fileID: 1917542049}
+  playerController: {fileID: 131247123}
+  playerRb: {fileID: 131247119}
 --- !u!1 &1689435007
 GameObject:
   m_ObjectHideFlags: 0

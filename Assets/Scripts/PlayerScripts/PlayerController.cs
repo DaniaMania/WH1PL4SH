@@ -24,7 +24,6 @@ public class PlayerController : MonoBehaviour
     [Header("Movement Inputs")]
     [SerializeField] private InputActionReference moveAction;
     [SerializeField] private InputActionReference jumpAction;
-    [SerializeField] private InputActionReference dashAction;
 
     void Start()
     {
@@ -43,61 +42,50 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
-        // If Coilback is rewinding, nothing here can happen
-        if (!coilback.IsRewinding)
-        {
-            CheckGround();
-            
-            Vector3 wishDirection = GetWishDirection(_moveInput);
-            Vector3 velocity = rb.linearVelocity;
-            Vector3 horizontalVelocity = new Vector3(velocity.x, 0, velocity.z);
+        // If the Coilback rewind is happening, input actions in FixedUpdate don't happen
+        if (coilback.IsRewinding) return;
 
-            Vector3 targetVelocity = wishDirection * movement.WalkGroundSpeed;
-            
-            Vector3 storedHorizontalVelocity = Walk(wishDirection, horizontalVelocity, targetVelocity);
-            
-            velocity.y = Jump(velocity, horizontalVelocity);
-            
-            rb.linearVelocity = new Vector3(storedHorizontalVelocity.x, velocity.y, storedHorizontalVelocity.z);
-        }
+        CheckGround();
+
+        Vector3 wishDirection = GetWishDirection(_moveInput);
+        Vector3 currentVelocity = rb.linearVelocity;
+        Vector3 currentHorizontal = new Vector3(currentVelocity.x, 0f, currentVelocity.z);
+        Vector3 targetHorizontal = wishDirection * movement.WalkGroundSpeed;
+        
+        // Calculate horizontal and vertical velocity with the methods 
+        Vector3 newHorizontal = CalculateHorizontalVelocity(wishDirection, currentHorizontal, targetHorizontal);
+        float newVertical = CalculateVerticalVelocity(currentVelocity.y, currentHorizontal);
+
+        // Apply velocities to player
+        rb.linearVelocity = new Vector3(newHorizontal.x, newVertical, newHorizontal.z);
     }
 
-    private Vector3 Walk(Vector3 wishDirection,  Vector3 horizontalVelocity, Vector3 targetVelocity)
+    private Vector3 CalculateHorizontalVelocity(Vector3 wishDirection, Vector3 currentHorizontal, Vector3 targetHorizontal)
     {
-        Vector3 nextHorizontal;
+        // rate float is the speed that the player's current position reaches the target position (horizontally)
+        float rate;
         
+        if (!_isGrounded)
+            rate = movement.WalkAirAcceleration;
+        else if (wishDirection == Vector3.zero)
+            rate = movement.WalkFriction;
+        else
+            rate = movement.WalkGroundAcceleration;
+
+        return Vector3.MoveTowards(currentHorizontal, targetHorizontal, rate * Time.fixedDeltaTime);
+    }
+
+    private float CalculateVerticalVelocity(float currentVertical, Vector3 currentHorizontal)
+    {
+        if (TryJump())
+            // v^2 = u^2 + 2as, with u = 0 at the peak
+            return Mathf.Sqrt(2f * movement.Gravity * movement.JumpHeight);
+
         if (_isGrounded)
-        {
-            if (wishDirection == new Vector3(0,0,0))
-                nextHorizontal = Vector3.MoveTowards(horizontalVelocity, targetVelocity, movement.WalkFriction * Time.fixedDeltaTime);
-            else
-                nextHorizontal = Vector3.MoveTowards(horizontalVelocity, targetVelocity, movement.WalkGroundAcceleration * Time.fixedDeltaTime);
-        }
-        else
-        {
-            nextHorizontal= Vector3.MoveTowards(horizontalVelocity, targetVelocity, movement.WalkAirAcceleration * Time.fixedDeltaTime);
-        }
-        
-        return nextHorizontal;
-    }
+            // Match the slope so the player sticks to the ground instead of launching off it
+            return -(currentHorizontal.x * _groundNormal.x + currentHorizontal.z * _groundNormal.z) / _groundNormal.y;
 
-    private float Jump(Vector3 velocity, Vector3 horizontalVelocity)
-    {
-        bool jumped = TryJump();
-        
-            
-        if (jumped)
-        {
-            // jumping equation based on real-world physics (kinematic equation v^2 = u^2 + 2as)
-            float jumpVelocity = Mathf.Sqrt(2 * movement.Gravity * movement.JumpHeight);
-            velocity.y = jumpVelocity;
-        }
-        else if (_isGrounded)
-            velocity.y = -(horizontalVelocity.x * _groundNormal.x + horizontalVelocity.z * _groundNormal.z) / _groundNormal.y;
-        else
-            velocity.y -= movement.Gravity * Time.fixedDeltaTime;
-
-        return velocity.y;
+        return currentVertical - movement.Gravity * Time.fixedDeltaTime;
     }
     
 
@@ -129,6 +117,7 @@ public class PlayerController : MonoBehaviour
             return false;
     }
 
+    // Ground check based on sphere cast
     private void CheckGround()
     {
         if ((Time.time - _lastLeaveGroundTime) < movement.GroundIgnoreAfterJump)
@@ -153,6 +142,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    // Gizmos for sphere cast
     private void OnDrawGizmos()
     {
         if (movement == null || playerCapsuleCollider == null)
@@ -171,6 +161,7 @@ public class PlayerController : MonoBehaviour
         Gizmos.DrawLine(origin, origin + Vector3.down * distance);
     }
 
+    // Sphere ground cast for the player
     private (Vector3 origin, float radius, float distance) GetGroundCastGeometry()
     {
         Vector3 localBottomCenter = playerCapsuleCollider.center - Vector3.up * (playerCapsuleCollider.height / 2 - playerCapsuleCollider.radius);
